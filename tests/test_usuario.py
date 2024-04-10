@@ -2,6 +2,7 @@ import sys
 sys.path.append('D:/Projetos/Python/SGD') #Altere para a raiz do seu projeto
 
 from app.services import Usuario
+from app.utils import valida_cpf
 from datetime import datetime
 
 def test_registrar_usuario(nome, cpf, data_nascimento, email, telefone, logradouro, numero, complemento, bairro, login, senha):
@@ -25,7 +26,15 @@ def test_registrar_usuario(nome, cpf, data_nascimento, email, telefone, logradou
 
 if __name__ == "__main__":
     nome = input('Informe o nome: ')
-    cpf = input('Informe o CPF: ')
+    
+    while True:
+        cpf = input('Informe o CPF (Apenas Números): ')
+        try:
+            cpf_validado = valida_cpf(cpf)
+            break
+        except ValueError as e:
+            print(e)
+    
     data_nascimento = input('Data de nascimento (DD/MM/AAAA): ')
     try:
         data_nascimento = datetime.strptime(data_nascimento, "%d/%m/%Y")
@@ -42,4 +51,4 @@ if __name__ == "__main__":
     login = input('Informe o login: ')
     senha = input('Informe a senha: ')
     
-    test_registrar_usuario(nome, cpf, data_nascimento, email, telefone, logradouro, numero, complemento, bairro, login, senha)
+    test_registrar_usuario(nome, cpf_validado, data_nascimento, email, telefone, logradouro, numero, complemento, bairro, login, senha)
