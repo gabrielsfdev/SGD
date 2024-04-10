@@ -1,0 +1,1 @@
+# Models: Diretório onde será estruturado todo o código relacionado à conexão e comunicação com o Banco de Dados.
