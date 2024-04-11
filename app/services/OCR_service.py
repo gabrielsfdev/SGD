@@ -1,11 +1,12 @@
 import cv2
 import pytesseract
 import re
+from convert_format import format_identificator
 
 # Pensar se é necessário transformar a classe em estática em sprint futura
 class OCR_DOCS:
     def __init__(self, img_path) -> None:
-        self.img = cv2.imread(f"{img_path}")
+        self.img = format_identificator(img_path)
         self.extracted = ""
 
     def new_rg(self):
