@@ -1,5 +1,6 @@
 import sys
-sys.path.append('D:/Projetos/Python/SGD') #Altere para a raiz do seu projeto
+import os
+sys.path.append(os.getenv('CAMINHO_RAIZ_PROJETO'))
 
 from app.services import Usuario
 from app.utils import *

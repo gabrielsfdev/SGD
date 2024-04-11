@@ -14,3 +14,13 @@ class UsuarioBD(Base):
     telefones = relationship('TelefoneBD', back_populates='usuario')
     emails = relationship('EmailBD', back_populates='usuario')
     enderecos = relationship('EnderecoBD', back_populates='usuario')
+    
+    
+    def dados_usuario(self):
+        return {
+            'id': self.id,
+            'nome': self.nome,
+            'login': self.login,
+            'data_nascimento': self.datanascimento.strftime('%Y-%m-%d') if self.datanascimento else None,
+            'cpf': self.cpf
+        }

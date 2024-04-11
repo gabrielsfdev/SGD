@@ -38,3 +38,26 @@ class Usuario:
             except IntegrityError:
                 session.rollback()
                 return {'message': 'Erro ao cadastrar usuário. Login ou e-mail já existente.'}
+
+
+    def login_usuario(self):
+        session = SessionLocal()
+        
+        try:
+            if '@' in self.login:
+                usuario = (session.query(UsuarioBD)
+                            .join(EmailBD, UsuarioBD.id == EmailBD.idusuario)
+                            .filter(EmailBD.email == self.login)
+                            .first())
+            else:
+                usuario = session.query(UsuarioBD).filter(UsuarioBD.login == self.login).first()
+            
+            if usuario:
+                if bcrypt.checkpw(self.senha.encode('utf-8'), usuario.senha.encode('utf-8')):
+                    return {'success': True, 'message': 'Login realizado com sucesso.', 'usuario': usuario}
+                else:
+                    return {'success': False, 'message': 'Senha incorreta.'}
+            else:
+                return {'success': False, 'message': 'Usuário não encontrado.'}
+        finally:
+            session.close()
