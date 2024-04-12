@@ -34,151 +34,176 @@ class Register(tk.Tk):
 
         self.image_blue_screen2 = PhotoImage(
             file=self.relative_to_assets("blue_screen2.png"))
-        self.canvas.create_image(512.0, 384.0, image=self.image_blue_screen2)
+        self.blue_screen2 = self.canvas.create_image(
+            512.0,
+            384.0,
+            image=self.image_blue_screen2
+        )
 
         self.image_rectangle2 = PhotoImage(
             file=self.relative_to_assets("rectangle2.png"))
         self.rectangle2 = self.canvas.create_image(
-            512.0,
-            101.0,
+            345.0,
+            114.0,
             image=self.image_rectangle2
         )
 
         self.image_rectangle3 = PhotoImage(
             file=self.relative_to_assets("rectangle3.png"))
         self.rectangle3 = self.canvas.create_image(
-            241.0,
-            181.0,
+            783.0,
+            114.0,
             image=self.image_rectangle3
         )
 
         self.image_rectangle4 = PhotoImage(
             file=self.relative_to_assets("rectangle4.png"))
         self.rectangle4 = self.canvas.create_image(
-            626.0,
-            181.0,
+            216.0,
+            194.0,
             image=self.image_rectangle4
         )
 
         self.rectangle4 = self.canvas.create_image(
-            292.0,
-            281.0,
+            500.0,
+            194.0,
+            image=self.image_rectangle4
+        )
+
+        self.rectangle4 = self.canvas.create_image(
+            784.0,
+            194.0,
             image=self.image_rectangle4
         )
 
         self.image_rectangle5 = PhotoImage(
             file=self.relative_to_assets("rectangle5.png"))
         self.rectangle5 = self.canvas.create_image(
-            589.0,
-            281.0,
+            292.0,
+            294.0,
             image=self.image_rectangle5
         )
 
         self.image_rectangle6 = PhotoImage(
             file=self.relative_to_assets("rectangle6.png"))
         self.rectangle6 = self.canvas.create_image(
-            808.0,
-            281.0,
+            587.0,
+            294.0,
             image=self.image_rectangle6
+        )
+
+        self.rectangle4 = self.canvas.create_image(
+            806.0,
+            294.0,
+            image=self.image_rectangle4
+        )
+
+        self.rectangle3 = self.canvas.create_image(
+            240.0,
+            374.0,
+            image=self.image_rectangle3
         )
 
         self.image_rectangle7 = PhotoImage(
             file=self.relative_to_assets("rectangle7.png"))
         self.rectangle7 = self.canvas.create_image(
-            251.0,
-            361.0,
+            606.0,
+            374.0,
             image=self.image_rectangle7
         )
 
         self.image_rectangle8 = PhotoImage(
             file=self.relative_to_assets("rectangle8.png"))
         self.rectangle8 = self.canvas.create_image(
-            626.0,
-            361.0,
+            858.0,
+            374.0,
             image=self.image_rectangle8
         )
 
-        self.image_rectangle9 = PhotoImage(
-            file=self.relative_to_assets("rectangle9.png"))
-        self.rectangle9 = self.canvas.create_image(
-            877.0,
-            361.0,
-            image=self.image_rectangle9
+        self.rectangle3 = self.canvas.create_image(
+            241.0,
+            474.0,
+            image=self.image_rectangle3
+        )
+
+        self.rectangle2 = self.canvas.create_image(
+            679.0,
+            474.0,
+            image=self.image_rectangle2
         )
 
         self.rectangle3 = self.canvas.create_image(
             241.0,
-            461.0,
-            image=self.image_rectangle3
-        )
-
-        self.image_rectangle10 = PhotoImage(
-            file=self.relative_to_assets("rectangle10.png"))
-        self.rectangle10 = self.canvas.create_image(
-            678.0,
-            461.0,
-            image=self.image_rectangle10
-        )
-
-        self.rectangle3 = self.canvas.create_image(
-            241.0,
-            541.0,
+            554.0,
             image=self.image_rectangle3
         )
 
         self.rectangle3 = self.canvas.create_image(
-            574.0,
-            541.0,
+            575.0,
+            554.0,
             image=self.image_rectangle3
         )
+
+        self.canvas.create_text(
+            45.0,
+            686.0,
+            anchor="nw",
+            text="SGD",
+            fill="#FFFFFF",
+            font=("AbhayaLibre Regular", 40 * -1)
+        )
+
 
     def create_entries(self):
-        self.entryName = inputField.criar_campo_de_entrada(self, 101.0, 87.0, 'Nome Completo')
-        self.entryBirthdate = inputField.criar_campo_de_entrada(self, 101.0, 167.0, 'Data de Nascimento')
-        self.entryCPF = inputField.criar_campo_de_entrada(self, 435.0, 167.0, 'CPF')
-        self.entryStreet = inputField.criar_campo_de_entrada(self, 101.0, 267.0, 'Logradouro')
-        self.entryNumber = inputField.criar_campo_de_entrada(self, 536.0, 267.0, 'Número', False, 80)
-        self.entryStreet2 = inputField.criar_campo_de_entrada(self, 692.0, 267.0, 'Complemento')
-        self.entryNeighborhood = inputField.criar_campo_de_entrada(self, 101.0, 347.0, 'Bairro')
-        self.entryCity = inputField.criar_campo_de_entrada(self, 456.0, 347.0, 'Cidade')
-        self.entryUF = inputField.criar_campo_de_entrada(self, 849.0, 347.0, 'UF', False, 50)
-        self.entryPhonenumber = inputField.criar_campo_de_entrada(self, 101.0, 447.0, 'Telefone')
-        self.entryEmail = inputField.criar_campo_de_entrada(self, 433.0, 447.0, 'E-mail')
-        self.entryPassword = inputField.criar_campo_de_entrada(self, 101.0, 527.0, 'Senha', True)
-        self.entryPasswordagain = inputField.criar_campo_de_entrada(self, 432.0, 527.0, 'Repetir Senha', True)
+        self.entryName = inputField.criar_campo_de_entrada(self, 100.0, 100.0, 'Nome Completo')
+        self.entryBirthdate = inputField.criar_campo_de_entrada(self, 642.0, 100.0, 'Data de Nascimento')
+        self.entryCPF = inputField.criar_campo_de_entrada(self, 100.0, 180.0, 'CPF')
+        self.entryPhonenumber = inputField.criar_campo_de_entrada(self, 384.0, 180.0, 'Telefone')
+        self.entryCEP = inputField.criar_campo_de_entrada(self, 668.0, 180.0, 'CEP')
+        self.entryStreet = inputField.criar_campo_de_entrada(self, 100.0, 280.0, 'Logradouro')
+        self.entryNumber = inputField.criar_campo_de_entrada(self, 536.0, 280.0, 'Número', False, 80)
+        self.entryStreet2 = inputField.criar_campo_de_entrada(self, 690.0, 280.0, 'Complemento')
+        self.entryNeighborhood = inputField.criar_campo_de_entrada(self, 100.0, 360.0, 'Bairro')
+        self.entryCity = inputField.criar_campo_de_entrada(self, 433.0, 360.0, 'Cidade')
+        self.entryUF = inputField.criar_campo_de_entrada(self, 831.0, 360.0, 'UF', False, 50)
+        self.entryUsername = inputField.criar_campo_de_entrada(self, 100.0, 460.0, 'Nome de Usuário')
+        self.entryEmail = inputField.criar_campo_de_entrada(self, 434.0, 460.0, 'E-mail')
+        self.entryPassword = inputField.criar_campo_de_entrada(self, 100.0, 540.0, 'Senha', True)
+        self.entryPasswordagain = inputField.criar_campo_de_entrada(self, 434.0, 540.0, 'Repetir Senha', True)
 
     def create_buttons(self):
-        self.voltar_image = PhotoImage(
+        self.image_voltar = PhotoImage(
             file=self.relative_to_assets("voltar.png"))
         voltar = Button(
-            image=self.voltar_image,
+            image=self.image_voltar,
             borderwidth=0,
             highlightthickness=0,
             command=self.open_login,
             relief="flat"
         )
         voltar.place(
-            x=522.0,
-            y=642.0,
+            x=556.0,
+            y=668.0,
             width=189.0,
             height=50.0
         )
 
-        self.cadastrar_image = PhotoImage(
+        self.image_cadastrar = PhotoImage(
             file=self.relative_to_assets("cadastrar.png"))
         cadastrar = Button(
-            image=self.cadastrar_image,
+            image=self.image_cadastrar,
             borderwidth=0,
             highlightthickness=0,
             command=lambda: print("cadastrar clicked"),
             relief="flat"
         )
         cadastrar.place(
-            x=731.0,
-            y=642.0,
+            x=765.0,
+            y=668.0,
             width=189.0,
             height=50.0
         )
+
     def open_login(self):
         self.destroy()
         from loginController import LoginController
@@ -187,3 +212,4 @@ class Register(tk.Tk):
 
     def run(self):
         self.mainloop()
+        

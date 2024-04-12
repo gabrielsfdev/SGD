@@ -19,7 +19,7 @@ class Login(tk.Tk):
 
     def relative_to_assets(self, path: str) -> Path:
         return self.assets_path / Path(path)
-
+    
     def create_canvas(self):
         self.canvas = Canvas(
             self,
@@ -48,6 +48,22 @@ class Login(tk.Tk):
             image=self.image_folders
         )
 
+        self.canvas.create_text(
+            45.0,
+            686.0,
+            anchor="nw",
+            text="SGD",
+            fill="#FFFFFF",
+            font=("AbhayaLibre Regular", 40 * -1)
+        )
+        self.canvas.create_text(
+            624.0,
+            144.0,
+            anchor="nw",
+            text="SGD",
+            fill="#006DFF",
+            font=("AbhayaLibre Regular", 128 * -1)
+        )
         self.image_rectangle1 = PhotoImage(
             file=self.relative_to_assets("rectangle1.png"))
 
@@ -79,10 +95,9 @@ class Login(tk.Tk):
             width=162.0,
             height=25.0
         )
-    
     def create_entries(self):
-         self.entryEmail = inputField.criar_campo_de_entrada(self, 633.0, 349.0, 'E-mail')
-         self.entryPassword = inputField.criar_campo_de_entrada(self, 633.0, 429.0, 'Senha', True)
+        self.entryEmail = inputField.criar_campo_de_entrada(self, 633.0, 349.0, 'Nome de Usuário')
+        self.entryPassword = inputField.criar_campo_de_entrada(self, 633.0, 429.0, 'Senha', True)
 
     def create_buttons(self):
         self.image_cadastre = PhotoImage(
@@ -140,7 +155,7 @@ class Login(tk.Tk):
         image=self.image_Esqueci_minha_senha,
         borderwidth=0,
         highlightthickness=0,
-        command=lambda: print("Esqueci_minha_senha clicked"),
+        command=self.open_esqueceu_sua_senha,
         relief="flat"
         )
         Esqueci_minha_senha.place(
@@ -156,7 +171,9 @@ class Login(tk.Tk):
         password = self.entryPassword.get()
         result = self.controller.authenticate(username, password)
         if result:
-            messagebox.showinfo("Login feito", "Boas vindas, " + username)
+            self.destroy()
+            from principalScreen import PagPrincipal
+            PagPrincipal(self).run()
         else:
             messagebox.showerror("Falha no Login", "Usuário ou senha inválida")
 
@@ -164,3 +181,10 @@ class Login(tk.Tk):
         self.destroy()
         from registerScreen import Register
         Register(self).run()
+
+    def open_esqueceu_sua_senha(self):
+        self.destroy()
+        from recuperarSenhaScreen import RecuperarSenha
+        RecuperarSenha(self).run
+
+
