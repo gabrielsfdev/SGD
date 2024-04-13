@@ -1,9 +1,11 @@
 import sys
-sys.path.append('D:/Projetos/Python/SGD') #Altere para a raiz do seu projeto
+import os
+sys.path.append(os.getenv('CAMINHO_RAIZ_PROJETO'))
 
 from app.services import Usuario
-from app.utils import valida_cpf
+from app.utils import *
 from datetime import datetime
+import json
 
 def test_registrar_usuario(nome, cpf, data_nascimento, email, telefone, logradouro, numero, complemento, bairro, login, senha):
     usuario = Usuario(
@@ -44,10 +46,30 @@ if __name__ == "__main__":
     
     email = input('Informe o email: ')
     telefone = input('Informe o telefone com DDD: ')
-    logradouro = input('Informe o logradouro (Rua, Avenida, etc): ')
-    numero = input('Informe o número da residencia: ')
-    complemento = input('Informe o complemento: ')
-    bairro = input('Informe o bairro: ')
+    
+    while True:
+        cep = input('Informe o CEP com 8 números: ')
+        try:
+            dados_cep = busca_cep(cep)
+            break
+        except ValueError as e:
+            print(e)
+            
+    if dados_cep.status_code == 200:
+        json_cep = json.loads(dados_cep.content.decode('utf-8'))
+        cep = json_cep['cep']
+        logradouro = json_cep['logradouro']
+        bairro = json_cep['bairro']
+        cidade = json_cep['localidade']
+        numero = input('Informe o número da residencia: ')
+        complemento = input('Informe o complemento: ')
+    else:
+        logradouro = input('Informe o logradouro (Rua, Avenida, etc): ')
+        numero = input('Informe o número da residencia: ')
+        complemento = input('Informe o complemento: ')
+        bairro = input('Informe o bairro: ')
+        cidade = input('Informe a cidade: ')
+    
     login = input('Informe o login: ')
     senha = input('Informe a senha: ')
     
