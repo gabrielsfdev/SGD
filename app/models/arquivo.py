@@ -12,6 +12,8 @@ class ArquivoBD(Base):
     idescritorio = Column(Integer, ForeignKey('escritorio.id'), nullable=True)
     datacriacao = Column(DateTime)
     restricao = Column(bool, default=False)
+    tipo = Column(String(10))
+    tamanho = Column(Integer)
     usuario = relationship('UsuarioBD', back_populates='usuario')
     setor = relationship('SetorBD', back_populates='setor')
     escritorio = relationship('EscritorioBD', back_populates='escritorio')
