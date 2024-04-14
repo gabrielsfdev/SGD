@@ -2,5 +2,6 @@
 # Centralização das dependencias do módulo "services" para importação
 from .usuario_service import Usuario
 from .sessao_service import Sessao
+from .arquivo_service import Arquivo
 
-__all__ = ['Usuario', 'Sessao']
+__all__ = ['Usuario', 'Sessao', 'Arquivo']
