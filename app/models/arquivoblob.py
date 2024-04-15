@@ -8,4 +8,4 @@ class ArquivoBlobBD(Base):
     id = Column(Integer, primary_key=True)
     idarquivo = Column(Integer, ForeignKey('arquivo.id'))
     blob_dados = Column(LargeBinary)
-    arquivo = relationship('ArquivoBD', back_populates='arquivo')
+    arquivo = relationship('ArquivoBD', back_populates='blob')

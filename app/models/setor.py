@@ -7,4 +7,4 @@ class SetorBD(Base):
     __tablename__ = 'setor'
     id = Column(Integer, primary_key=True)
     setor = Column(String(50))
-    arquivo = relationship('ArquivoBD', back_populates='arquivo')
+    arquivos = relationship('ArquivoBD', back_populates='setor')
