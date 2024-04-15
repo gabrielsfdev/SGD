@@ -1,47 +1,35 @@
-from pathlib import Path
-import tkinter as tk
-from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
-import time
+from tkinter import PhotoImage
+from baseApp import BaseApp
 
-
-class PagPrincipal(tk.Tk):
+class PagPrincipal(BaseApp):
     def __init__(self, controller):
-        self.controller = controller
-        super().__init__()
-        self.geometry("1024x768+200-50")
-        self.configure(bg="#FFFFFF")
-        self.output_path = Path(__file__).parent
-        self.assets_path = self.output_path / "assets" / "frame0"
-
+        super().__init__(controller)
         self.create_canvas()
-        self.bind_text_events([self.adicionar_foto, self.desconectar, self.editar_perfil,
-                               self.painel_central, self.gestao_documentos, self.upload_documentos,
-                               self.compartilhamentos, self.notificacoes, self.historico,
-                               self.ajuda])  # Adiciona os textos aqui
+        self.draw_rectangle()
+        self.criar_imagem()
+        self.criar_texto()
+        self.create_button()
     
-    def relative_to_assets(self, path: str) -> Path:
-        return self.assets_path / Path(path)
+    def draw_rectangle(self):
+        self.canvas.create_rectangle(0, 0, 338.0, 768.0, fill="#006DFF", outline="")
+
+        self.canvas.create_rectangle(
+            22.0,
+            634.0,
+            314.9978766441345,
+            636.1144957300276,
+            fill="#FFFFFF",
+            outline="")
+        
+        self.canvas.create_rectangle(
+            22.0,
+            205.0,
+            314.9978766441345,
+            207.11449573002756,
+            fill="#FFFFFF",
+            outline="")
     
-    def create_canvas(self):
-        self.canvas = Canvas(
-            self,
-            bg="#FFFFFF",
-            height=768,
-            width=1024,
-            bd=0,
-            highlightthickness=0,
-            relief="ridge"
-        )
-        self.canvas.place(x=0, y=0)
-
-        self.image_blue_screen3 = PhotoImage(
-            file=self.relative_to_assets("blue_screen3.png"))
-        self.blue_screen3 = self.canvas.create_image(
-            169.0,
-            384.0,
-            image=self.image_blue_screen3
-        )
-
+    def criar_imagem(self):
         self.image_toy1 = PhotoImage(
             file=self.relative_to_assets("toy1.png"))
         self.toy1 = self.canvas.create_image(
@@ -58,6 +46,7 @@ class PagPrincipal(tk.Tk):
             image=self.image_photo1
         )
 
+    def create_button(self):
         self.adicionar_foto = self.canvas.create_text(
             130.0,
             122.5,
@@ -66,6 +55,7 @@ class PagPrincipal(tk.Tk):
             fill="#FFFFFF",
             font=("Abel Regular", 14 * -1)
         )
+        self.bind_text_events(self.adicionar_foto)
 
         self.desconectar = self.canvas.create_text(
             111.0,
@@ -75,14 +65,7 @@ class PagPrincipal(tk.Tk):
             fill="#FFFFFF",
             font=("Abel Regular", 24 * -1)
         )
-
-        self.canvas.create_rectangle(
-            22.0,
-            205.0,
-            314.9978766441345,
-            207.11449573002756,
-            fill="#FFFFFF",
-            outline="")
+        self.bind_text_events(self.desconectar)
 
         self.editar_perfil = self.canvas.create_text(
             23.0,
@@ -92,6 +75,7 @@ class PagPrincipal(tk.Tk):
             fill="#FFFFFF",
             font=("Abel Regular", 24 * -1)
         )
+        self.bind_text_events(self.editar_perfil)
 
         self.painel_central = self.canvas.create_text(
             23.0,
@@ -101,6 +85,7 @@ class PagPrincipal(tk.Tk):
             fill="#FFFFFF",
             font=("Abel Regular", 24 * -1)
         )
+        self.bind_text_events(self.painel_central)
 
         self.gestao_documentos = self.canvas.create_text(
             21.0,
@@ -110,6 +95,7 @@ class PagPrincipal(tk.Tk):
             fill="#FFFFFF",
             font=("Abel Regular", 24 * -1)
         )
+        self.bind_text_events(self.gestao_documentos)
 
         self.upload_documentos = self.canvas.create_text(
             21.0,
@@ -119,6 +105,7 @@ class PagPrincipal(tk.Tk):
             fill="#FFFFFF",
             font=("Abel Regular", 24 * -1)
         )
+        self.bind_text_events(self.upload_documentos)
 
         self.compartilhamentos = self.canvas.create_text(
             23.0,
@@ -128,6 +115,7 @@ class PagPrincipal(tk.Tk):
             fill="#FFFFFF",
             font=("Abel Regular", 24 * -1)
         )
+        self.bind_text_events(self.compartilhamentos)
 
         self.notificacoes = self.canvas.create_text(
             23.0,
@@ -137,6 +125,7 @@ class PagPrincipal(tk.Tk):
             fill="#FFFFFF",
             font=("Abel Regular", 24 * -1)
         )
+        self.bind_text_events(self.notificacoes)
 
         self.historico = self.canvas.create_text(
             23.0,
@@ -146,6 +135,7 @@ class PagPrincipal(tk.Tk):
             fill="#FFFFFF",
             font=("Abel Regular", 24 * -1)
         )
+        self.bind_text_events(self.historico)
 
         self.ajuda = self.canvas.create_text(
             23.0,
@@ -155,15 +145,9 @@ class PagPrincipal(tk.Tk):
             fill="#FFFFFF",
             font=("Abel Regular", 24 * -1)
         )
-
-        self.canvas.create_rectangle(
-            22.0,
-            634.0,
-            314.9978766441345,
-            636.1144957300276,
-            fill="#FFFFFF",
-            outline="")
-
+        self.bind_text_events(self.ajuda)
+    
+    def criar_texto(self):
         self.canvas.create_text(
             45.0,
             686.0,
@@ -172,38 +156,24 @@ class PagPrincipal(tk.Tk):
             fill="#FFFFFF",
             font=("AbhayaLibre Regular", 40 * -1)
         )
+    
+    def open_login(self):
+        self.destroy()
+        from loginController import LoginController
+        open = LoginController()
+        open.run()
+    
+    def open_upload_documentos(self):
+        self.destroy()
+        from uploadScreen import Upload
+        open = Upload(self)
+        open.run()
 
-    def bind_text_events(self, text_ids):
-        for text_id in text_ids:
-            self.canvas.tag_bind(text_id, "<Button-1>", self.on_text_click)
-            self.canvas.tag_bind(text_id, "<Enter>", self.on_enter)
-            self.canvas.tag_bind(text_id, "<Leave>", self.on_leave)
-
-    def on_enter(self, event):
-        self.canvas.config(cursor="hand2")
-
-    def on_leave(self, event):
-        self.canvas.config(cursor="")
-
-    def on_text_click(self, event):
-        text_id = self.canvas.find_closest(event.x, event.y)[0]
-        for _ in range(1):  # Altere o número de piscadas conforme necessário
-            self.canvas.itemconfig(text_id, fill="#000000")  # Altera para preto
-            if text_id is self.desconectar:
-                self.destroy()
-                from loginController import LoginController
-                open = LoginController()
-                open.run()
-            elif text_id is self.upload_documentos:
-                self.destroy()
-                from uploadScreen import Upload
-                open = Upload(self)
-                open.run()
-            self.update()  # Atualiza a janela
-            time.sleep(0.1)  # Aguarda um curto período
-            self.canvas.itemconfig(text_id, fill="#FFFFFF")  # Altera para branco
-            self.update()  # Atualiza a janela
-            time.sleep(0.1)  # Aguarda um curto período
+    def open_perfil(self):
+        self.destroy()
+        from perfilScreen import Perfil
+        open = Perfil(self)
+        open.run()
 
     def run(self):
         self.mainloop()

@@ -1,42 +1,19 @@
-from pathlib import Path
-import tkinter as tk
-from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
+from tkinter import Button, PhotoImage
+from baseApp import BaseApp
 
 
-class Upload(tk.Tk):
+class Upload(BaseApp):
     def __init__(self, controller):
-        super().__init__()
-        self.controller = controller
-        self.geometry("1024x768+200-50")
-        self.configure(bg="#FFFFFF")
-        self.output_path = Path(__file__).parent
-        self.assets_path = self.output_path / "assets" / "frame0"
-
+        super().__init__(controller)
         self.create_canvas()
+        self.draw_rectangle()
+        #self.create_entries()
         self.create_buttons()
-
-    def relative_to_assets(self, path: str) -> Path:
-        return self.assets_path / Path(path)
+        #self.criar_imagem()
+        #self.criar_texto()
     
-    def create_canvas(self):
-        self.canvas = Canvas(
-            self,
-            bg="#FFFFFF",
-            height=768,
-            width=1024,
-            bd=0,
-            highlightthickness=0,
-            relief="ridge"
-        )
-        self.canvas.place(x=0, y=0)
-
-        self.canvas.create_rectangle(
-            0.0,
-            0.0,
-            1024.0,
-            768.0,
-            fill="#006DFF",
-            outline="")
+    def draw_rectangle(self):
+        self.canvas.create_rectangle(0, 0, 1024.0, 768.0, fill="#006DFF", outline="")
     
     def create_buttons(self):
         self.image_escolha_um_arquivo = PhotoImage(

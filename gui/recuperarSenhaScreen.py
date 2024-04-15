@@ -1,44 +1,21 @@
-from pathlib import Path
-import tkinter as tk
-from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
+from tkinter import Button, PhotoImage
 import inputField
+from baseApp import BaseApp
 
-class RecuperarSenha(tk.Tk):
+class RecuperarSenha(BaseApp):
     def __init__(self, controller):
-        super().__init__()
-        self.controller = controller
-        self.geometry("1024x768+200-50")
-        self.configure(bg="#FFFFFF")
-        self.output_path = Path(__file__).parent
-        self.assets_path = self.output_path / "assets" / "frame0"
-
+        super().__init__(controller)
         self.create_canvas()
+        self.draw_rectangle()
+        self.criar_imagem()
+        self.criar_texto()
         self.create_entries()
         self.create_buttons()
-
-    def relative_to_assets(self, path: str) -> Path:
-        return self.assets_path / Path(path)
     
-    def create_canvas(self):
-        self.canvas = Canvas(
-            self,
-            bg="#FFFFFF",
-            height=768,
-            width=1024,
-            bd=0,
-            highlightthickness=0,
-            relief="ridge"
-        )
-        self.canvas.place(x=0, y=0)
-
-        self.image_blue_screen2 = PhotoImage(
-            file=self.relative_to_assets("blue_screen2.png"))
-        self.blue_screen2 = self.canvas.create_image(
-            512.0,
-            384.0,
-            image=self.image_blue_screen2
-        )
-
+    def draw_rectangle(self):
+        self.canvas.create_rectangle(0, 0, 1024.0, 768.0, fill="#006DFF", outline="")
+    
+    def criar_imagem(self):
         self.image_rectangle2 = PhotoImage(
             file=self.relative_to_assets("rectangle2.png"))
         self.rectangle2 = self.canvas.create_image(
@@ -46,7 +23,7 @@ class RecuperarSenha(tk.Tk):
             273.0,
             image=self.image_rectangle2
         )
-
+    def criar_texto(self):
         self.canvas.create_text(
             158.0,
             76.0,

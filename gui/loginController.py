@@ -11,3 +11,7 @@ class LoginController:
 
     def run(self):
         self.view.mainloop()
+
+if __name__ == "__main__":
+    app = LoginController()
+    app.run()
