@@ -2,3 +2,4 @@ __pycache__/
 .env
 ambiente_virtual/
 .vscode/launch.json
+sessao_usuario.json
