@@ -1,6 +1,6 @@
 from sqlalchemy.exc import IntegrityError
 import bcrypt
-from app.models import UsuarioBD, EnderecoBD, TelefoneBD, EmailBD
+from app.models import UsuarioBD, EnderecoBD, TelefoneBD, EmailBD, ArquivoBD
 from app.database import SessionLocal
 
 class Usuario:
