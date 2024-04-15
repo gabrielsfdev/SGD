@@ -4,6 +4,7 @@ sys.path.append(os.getenv('CAMINHO_RAIZ_PROJETO'))
 
 from app.services import Usuario, Sessao
 from app.utils import *
+from test_upload import main_upload
 
 def main():
     sessao = Sessao()
@@ -36,11 +37,12 @@ def fazer_login():
 if __name__ == "__main__":
     sessao = main()
     
-    opcao = int(input('Digite 1 para continuar e 0 para fazer LOGOUT: '))
+    opcao = int(input('Digite 1 para fazer um upload e 0 para fazer LOGOUT: '))
     
     if opcao == 0 and sessao.usuario_logado():
         if sessao.limpa_sessao():
             print('Logout realizado com sucesso.')
         else:
             print('Erro ao realizar o logout. Tente novamente.')
-        
+    elif opcao == 1:
+        main_upload()
