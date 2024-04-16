@@ -11,7 +11,7 @@ class Usuario:
         self.cpf = cpf
         self.datanascimento = datanascimento
 
-    def registrar_usuario(self, telefone, email, logradouro, numero, complemento, bairro, idcidade):
+    def registrar_usuario(self, telefone, email, cep, logradouro, numero, complemento, bairro, idcidade):
         with SessionLocal() as session:
             senha_hashed = bcrypt.hashpw(self.senha.encode(), bcrypt.gensalt())
             novo_usuario = UsuarioBD(
@@ -27,14 +27,14 @@ class Usuario:
                 
                 novo_telefone = TelefoneBD(telefone=telefone, idusuario=novo_usuario.id)
                 novo_email = EmailBD(email=email, idusuario=novo_usuario.id)
-                novo_endereco = EnderecoBD(logradouro=logradouro, numero=numero, complemento=complemento, bairro=bairro, idcidade=idcidade, idusuario=novo_usuario.id)
+                novo_endereco = EnderecoBD(cep=cep, logradouro=logradouro, numero=numero, complemento=complemento, bairro=bairro, idcidade=idcidade, idusuario=novo_usuario.id)
                 
                 session.add(novo_telefone)
                 session.add(novo_email)
                 session.add(novo_endereco)
                 
                 session.commit()
-                return {'message': 'Usuário cadastrado com sucesso!', 'id': novo_usuario.id}
+                return {'message': 'Usuário cadastrado com sucesso!', 'Sinta-se em casa, ': novo_usuario.nome}
             except IntegrityError:
                 session.rollback()
                 return {'message': 'Erro ao cadastrar usuário. Login ou e-mail já existente.'}
