@@ -1,45 +1,22 @@
-from pathlib import Path
-import tkinter as tk
-from tkinter import Tk, Canvas, Button, PhotoImage, Label, Checkbutton, IntVar, messagebox
+from tkinter import Button, PhotoImage, Checkbutton, IntVar, messagebox
 import inputField
+from baseApp import BaseApp
 
 
-class Login(tk.Tk):
+class Login(BaseApp):
     def __init__(self, controller):
-        super().__init__()
-        self.controller = controller
-        self.geometry("1024x768+200-50")
-        self.configure(bg="#FFFFFF")
-        self.output_path = Path(__file__).parent
-        self.assets_path = self.output_path / "assets" / "frame0"
-
+        super().__init__(controller)
         self.create_canvas()
+        self.draw_rectangle()
         self.create_entries()
         self.create_buttons()
+        self.criar_imagem()
+        self.criar_texto()
+    
+    def draw_rectangle(self):
+        self.canvas.create_rectangle(0, 0, 502.0, 768.0, fill="#006DFF", outline="")
 
-    def relative_to_assets(self, path: str) -> Path:
-        return self.assets_path / Path(path)
-
-    def create_canvas(self):
-        self.canvas = Canvas(
-            self,
-            bg="#FFFFFF",
-            height=768,
-            width=1024,
-            bd=0,
-            highlightthickness=0,
-            relief="ridge"
-        )
-        self.canvas.place(x=0, y=0)
-
-        self.image_blue_screen1 = PhotoImage(
-            file=self.relative_to_assets("blue_screen1.png"))
-        self.blue_screen1 = self.canvas.create_image(
-            251.0,
-            384.0,
-            image=self.image_blue_screen1
-        )
-
+    def criar_imagem(self):
         self.image_folders = PhotoImage(
             file=self.relative_to_assets("folders.png"))
         self.folders = self.canvas.create_image(
@@ -47,7 +24,6 @@ class Login(tk.Tk):
             235.0,
             image=self.image_folders
         )
-
         self.image_rectangle1 = PhotoImage(
             file=self.relative_to_assets("rectangle1.png"))
 
@@ -62,46 +38,64 @@ class Login(tk.Tk):
             442.0,
             image=self.image_rectangle1
         )
-
-        # Texto "Lembrar minha senha"
-        lembrar_minha_senha_text = "Lembrar minha senha"
-        lembrar_minha_senha = Label(
-            self,
-            text=lembrar_minha_senha_text,
-            bg="#FFFFFF",
-            fg="#000000",  # Cor do texto
-            font=("Arial", 12),  # Fonte e tamanho do texto
-        )
-        # Posição do texto
-        lembrar_minha_senha.place(
-            x=682.0,
-            y=577.0,
-            width=162.0,
-            height=25.0
-        )
     
+    def criar_texto(self):
+        self.canvas.create_text(
+            45.0,
+            686.0,
+            anchor="nw",
+            text="SGD",
+            fill="#FFFFFF",
+            font=("AbhayaLibre Regular", 40 * -1)
+        )
+        self.canvas.create_text(
+            624.0,
+            144.0,
+            anchor="nw",
+            text="SGD",
+            fill="#006DFF",
+            font=("AbhayaLibre Regular", 128 * -1)
+        )
+        
+        self.canvas.create_text(
+            685.0,
+            580.0,
+            anchor="nw",
+            text="Lembrar minha senha",
+            fill="#006DFF",
+            font=("AbhayaLibre Regular", 15 * -1)
+        )
+
+        self.cadastre = self.canvas.create_text(
+            822,  # Posição x
+            30,  # Posição y
+            anchor="nw",  # Âncora no canto superior esquerdo
+            text="Cadastre-se",
+            fill="#006DFF",
+            font=("AbhayaLibre Regular", 30 * -1),
+        )
+        
+        self.underline_text(self.cadastre)
+        self.bind_text_events(self.cadastre)
+        
+
+        self.esqueci_minha_senha = self.canvas.create_text(
+            660.0,
+            632.0,
+            anchor="nw",
+            text="Esqueci minha senha",
+            fill="#006DFF",
+            font=("AbhayaLibre Regular", 20 * -1)
+        )
+        self.underline_text(self.esqueci_minha_senha)
+        self.bind_text_events(self.esqueci_minha_senha)
+
     def create_entries(self):
-         self.entryEmail = inputField.criar_campo_de_entrada(self, 633.0, 349.0, 'E-mail')
-         self.entryPassword = inputField.criar_campo_de_entrada(self, 633.0, 429.0, 'Senha', True)
+        self.entryUsername = inputField.criar_campo_de_entrada(self, 633.0, 349.0, 'Nome de Usuário')
+        self.entryPassword = inputField.criar_campo_de_entrada(self, 633.0, 429.0, 'Senha', senha=True)
 
     def create_buttons(self):
-        self.image_cadastre = PhotoImage(
-        file=self.relative_to_assets("cadastre.png"))
-        cadastre = Button(
-        image=self.image_cadastre,
-        borderwidth=0,
-        highlightthickness=0,
-        command=self.open_cadastre,
-        relief="flat"
-        )
-        cadastre.place(
-        x=822.0,
-        y=30.0,
-        width=149.0,
-        height=41.0
-        )
-        cadastre.config(cursor='hand2')  # Define o cursor para uma mãozinha quando passar sobre o botão
-
+       
         self.conectar_image = PhotoImage(
         file=self.relative_to_assets("conectar.png"))
         conectar = Button(
@@ -134,29 +128,14 @@ class Login(tk.Tk):
             height=25.0
         )
 
-        self.image_Esqueci_minha_senha = PhotoImage(
-        file=self.relative_to_assets("Esqueci_minha_senha.png"))
-        Esqueci_minha_senha = Button(
-        image=self.image_Esqueci_minha_senha,
-        borderwidth=0,
-        highlightthickness=0,
-        command=lambda: print("Esqueci_minha_senha clicked"),
-        relief="flat"
-        )
-        Esqueci_minha_senha.place(
-        x=682.0,
-        y=632.0,
-        width=161.0,
-        height=25.0
-        )
-        Esqueci_minha_senha.config(cursor='hand2')  # Define o cursor para uma mãozinha quando passar sobre o botão
-
     def login(self):
-        username = self.entryEmail.get()
+        username = self.entryUsername.get()
         password = self.entryPassword.get()
         result = self.controller.authenticate(username, password)
         if result:
-            messagebox.showinfo("Login feito", "Boas vindas, " + username)
+            self.destroy()
+            from principalScreen import PagPrincipal
+            PagPrincipal(self).run()
         else:
             messagebox.showerror("Falha no Login", "Usuário ou senha inválida")
 
@@ -164,3 +143,8 @@ class Login(tk.Tk):
         self.destroy()
         from registerScreen import Register
         Register(self).run()
+
+    def open_esqueceu_sua_senha(self):
+        self.destroy()
+        from recuperarSenhaScreen import RecuperarSenha
+        RecuperarSenha(self).run()       
