@@ -87,15 +87,15 @@ class PagPrincipal(BaseApp):
         )
         self.bind_text_events(self.painel_central)
 
-        self.gestao_documentos = self.canvas.create_text(
+        self.consultar_documentos = self.canvas.create_text(
             21.0,
             329.114501953125,
             anchor="nw",
-            text="Gestão de Documentos",
+            text="Consultar Documentos",
             fill="#FFFFFF",
             font=("Abel Regular", 24 * -1)
         )
-        self.bind_text_events(self.gestao_documentos)
+        self.bind_text_events(self.consultar_documentos)
 
         self.upload_documentos = self.canvas.create_text(
             21.0,
@@ -173,6 +173,12 @@ class PagPrincipal(BaseApp):
         self.destroy()
         from perfilScreen import Perfil
         open = Perfil(self)
+        open.run()
+
+    def open_consultar_documentos(self):
+        self.destroy()
+        from consultaScreen import Consulta
+        open = Consulta(self)
         open.run()
 
     def run(self):
