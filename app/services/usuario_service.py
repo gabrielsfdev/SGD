@@ -54,6 +54,9 @@ class Usuario:
             
             if usuario:
                 if bcrypt.checkpw(self.senha.encode('utf-8'), usuario.senha.encode('utf-8')):
+                    from app.services import Sessao
+                    sessao = Sessao()
+                    sessao.registra_sessao(usuario)
                     return {'success': True, 'message': 'Login realizado com sucesso.', 'usuario': usuario}
                 else:
                     return {'success': False, 'message': 'Senha incorreta.'}
@@ -61,3 +64,4 @@ class Usuario:
                 return {'success': False, 'message': 'Usuário não encontrado.'}
         finally:
             session.close()
+            
