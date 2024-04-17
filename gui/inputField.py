@@ -13,7 +13,7 @@ def on_focusout(event, entry, texto, senha=False):
         if senha:
             entry.config(show='')  # Remove a configuração para mostrar asteriscos se o campo de senha estiver vazio
 
-def criar_campo_de_entrada(root, x, y, texto, obrigatorio=False, senha=False, width=200, height=20):
+def criar_campo_de_entrada(root, x, y, texto, obrigatorio=False, senha=False, width=200, height=25):
     entry = Entry(root, fg='grey', show='' if senha else None)
     
     # Adiciona um asterisco se o campo for obrigatório

@@ -55,7 +55,7 @@ class PagPrincipal(BaseApp):
             fill="#FFFFFF",
             font=("Abel Regular", 14 * -1)
         )
-        self.bind_text_events(self.adicionar_foto)
+        self.bind_text_events_principal(self.adicionar_foto)
 
         self.desconectar = self.canvas.create_text(
             111.0,
@@ -65,7 +65,7 @@ class PagPrincipal(BaseApp):
             fill="#FFFFFF",
             font=("Abel Regular", 24 * -1)
         )
-        self.bind_text_events(self.desconectar)
+        self.bind_text_events_principal(self.desconectar)
 
         self.editar_perfil = self.canvas.create_text(
             23.0,
@@ -75,7 +75,7 @@ class PagPrincipal(BaseApp):
             fill="#FFFFFF",
             font=("Abel Regular", 24 * -1)
         )
-        self.bind_text_events(self.editar_perfil)
+        self.bind_text_events_principal(self.editar_perfil)
 
         self.painel_central = self.canvas.create_text(
             23.0,
@@ -85,7 +85,7 @@ class PagPrincipal(BaseApp):
             fill="#FFFFFF",
             font=("Abel Regular", 24 * -1)
         )
-        self.bind_text_events(self.painel_central)
+        self.bind_text_events_principal(self.painel_central)
 
         self.consultar_documentos = self.canvas.create_text(
             21.0,
@@ -95,7 +95,7 @@ class PagPrincipal(BaseApp):
             fill="#FFFFFF",
             font=("Abel Regular", 24 * -1)
         )
-        self.bind_text_events(self.consultar_documentos)
+        self.bind_text_events_principal(self.consultar_documentos)
 
         self.upload_documentos = self.canvas.create_text(
             21.0,
@@ -105,7 +105,7 @@ class PagPrincipal(BaseApp):
             fill="#FFFFFF",
             font=("Abel Regular", 24 * -1)
         )
-        self.bind_text_events(self.upload_documentos)
+        self.bind_text_events_principal(self.upload_documentos)
 
         self.compartilhamentos = self.canvas.create_text(
             23.0,
@@ -115,7 +115,7 @@ class PagPrincipal(BaseApp):
             fill="#FFFFFF",
             font=("Abel Regular", 24 * -1)
         )
-        self.bind_text_events(self.compartilhamentos)
+        self.bind_text_events_principal(self.compartilhamentos)
 
         self.notificacoes = self.canvas.create_text(
             23.0,
@@ -125,7 +125,7 @@ class PagPrincipal(BaseApp):
             fill="#FFFFFF",
             font=("Abel Regular", 24 * -1)
         )
-        self.bind_text_events(self.notificacoes)
+        self.bind_text_events_principal(self.notificacoes)
 
         self.historico = self.canvas.create_text(
             23.0,
@@ -135,7 +135,7 @@ class PagPrincipal(BaseApp):
             fill="#FFFFFF",
             font=("Abel Regular", 24 * -1)
         )
-        self.bind_text_events(self.historico)
+        self.bind_text_events_principal(self.historico)
 
         self.ajuda = self.canvas.create_text(
             23.0,
@@ -145,7 +145,7 @@ class PagPrincipal(BaseApp):
             fill="#FFFFFF",
             font=("Abel Regular", 24 * -1)
         )
-        self.bind_text_events(self.ajuda)
+        self.bind_text_events_principal(self.ajuda)
     
     def criar_texto(self):
         self.canvas.create_text(

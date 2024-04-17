@@ -1,8 +1,7 @@
 from tkinter import ttk
-from baseApp import BaseApp
+from baseTab import BaseTab
 
-
-class Consulta(BaseApp):
+class Consulta(BaseTab):
     def __init__(self, controller):
         super().__init__(controller)
         self.create_canvas()

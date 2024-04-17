@@ -1,6 +1,7 @@
 import sys
-import os
-sys.path.append(os.getenv('CAMINHO_RAIZ_PROJETO'))
+from pathlib import Path
+project_dir = Path(__file__).resolve().parent.parent
+sys.path.append(str(project_dir))
 import tkinter as tk
 from tkinter import Button, PhotoImage, messagebox
 import inputField

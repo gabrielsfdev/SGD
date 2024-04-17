@@ -76,7 +76,7 @@ class Login(BaseApp):
         )
         
         self.underline_text(self.cadastre)
-        self.bind_text_events(self.cadastre)
+        self.bind_text_events_login(self.cadastre)
         
 
         self.esqueci_minha_senha = self.canvas.create_text(
@@ -88,7 +88,7 @@ class Login(BaseApp):
             font=("AbhayaLibre Regular", 20 * -1)
         )
         self.underline_text(self.esqueci_minha_senha)
-        self.bind_text_events(self.esqueci_minha_senha)
+        self.bind_text_events_login(self.esqueci_minha_senha)
 
     def create_entries(self):
         self.entryUsername = inputField.criar_campo_de_entrada(self, 633.0, 349.0, 'Nome de Usuário')
