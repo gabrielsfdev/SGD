@@ -1,6 +1,15 @@
-from tkinter import Button, PhotoImage
+import sys
+import os
+sys.path.append(os.getenv('CAMINHO_RAIZ_PROJETO'))
+import tkinter as tk
+from tkinter import Button, PhotoImage, messagebox
 import inputField
 from baseApp import BaseApp
+import inputField
+from app.services import Usuario
+from app.services import Mascara
+from app.utils import *
+import json
 
 
 class Register(BaseApp):
@@ -135,10 +144,16 @@ class Register(BaseApp):
 
     def create_entries(self):
         self.entryName = inputField.criar_campo_de_entrada(self, 100.0, 100.0, 'Nome Completo')
-        self.entryBirthdate = inputField.criar_campo_de_entrada(self, 642.0, 100.0, 'Data de Nascimento')
-        self.entryCPF = inputField.criar_campo_de_entrada(self, 100.0, 180.0, 'CPF')
-        self.entryPhonenumber = inputField.criar_campo_de_entrada(self, 384.0, 180.0, 'Telefone')
-        self.entryCEP = inputField.criar_campo_de_entrada(self, 668.0, 180.0, 'CEP')
+        self.entryBirthdate = Mascara(self, formato="date", placeholder="Data de Nascimento", tamanho_max=8)
+        self.entryBirthdate.entrada.place(x=642.0, y=100.0, width=200, height=25)
+        self.entryCPF = Mascara(self, formato="cpf", placeholder="CPF", tamanho_max=11)
+        self.entryCPF.entrada.place(x=100.0, y=180.0, width=200, height=25)
+        self.entryCPF.entrada.bind("<FocusOut>", self.valida_cpf)
+        self.entryPhonenumber = Mascara(self, formato="telefone", placeholder="Telefone", tamanho_max=11)
+        self.entryPhonenumber.entrada.place(x=384.0, y=180.0, width=200, height=25)
+        self.entryCEP = Mascara(self, formato="cep", placeholder="CEP", tamanho_max=8)
+        self.entryCEP.entrada.place(x=668.0, y=180.0, width=200, height=25)
+        self.entryCEP.entrada.bind("<FocusOut>", self.preenche_endereco)
         self.entryStreet = inputField.criar_campo_de_entrada(self, 100.0, 280.0, 'Logradouro')
         self.entryNumber = inputField.criar_campo_de_entrada(self, 536.0, 280.0, 'Número', width=80)
         self.entryStreet2 = inputField.criar_campo_de_entrada(self, 690.0, 280.0, 'Complemento')
@@ -173,7 +188,7 @@ class Register(BaseApp):
             image=self.image_cadastrar,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: print("cadastrar clicked"),
+            command=self.cadastrar_usuario,
             relief="flat"
         )
         cadastrar.place(
@@ -182,6 +197,95 @@ class Register(BaseApp):
             width=189.0,
             height=50.0
         )
+        
+    def valida_cpf(self, event=None):
+        cpf = self.entryCPF.get()
+        try:
+            valida_cpf(cpf)
+            return
+        except ValueError as e:
+            messagebox.showerror('Erro Validação CPF', e)
+            self.entryCPF.delete(0, tk.END)
+            self.entryCPF.focus_set()
+
+    def preenche_endereco(self, event=None):
+        cep = self.entryCEP.get()
+        try:
+            dados_cep = busca_cep(cep)
+            if dados_cep.status_code == 200:
+                json_cep = json.loads(dados_cep.content.decode('utf-8'))
+                
+                if len(json_cep) == 1:
+                    messagebox.showerror('CEP não localizado', 'CEP não localizado. Preencha o endereço manualmente')
+                    cep = cep[:5] + '-' + cep[5:]
+                    
+                    self.entryCEP.delete(0, tk.END)
+                    self.entryCEP.insert(0, cep)
+                    self.entryStreet.delete(0, tk.END)
+                    self.entryNeighborhood.delete(0, tk.END)
+                    self.entryCity.delete(0, tk.END)
+                    self.entryCity.delete(0, tk.END)
+                    self.entryUF.delete(0, tk.END)
+                    
+                    self.entryStreet.focus_set()
+                else:
+                    self.entryCEP.delete(0, tk.END)
+                    self.entryCEP.insert(0, json_cep['cep'])
+                    
+                    self.entryStreet.delete(0, tk.END)
+                    self.entryStreet.insert(0, json_cep['logradouro'])
+                    self.entryStreet.config(fg='black')
+                    
+                    self.entryNeighborhood.delete(0, tk.END)
+                    self.entryNeighborhood.insert(0, json_cep['bairro'])
+                    self.entryNeighborhood.config(fg='black')
+                    
+                    self.entryCity.delete(0, tk.END)
+                    self.entryCity.insert(0, json_cep['localidade'])
+                    self.entryCity.config(fg='black')
+                    
+                    self.entryUF.delete(0, tk.END)
+                    self.entryUF.insert(0, json_cep['uf'])
+                    self.entryUF.config(fg='black')
+        except Exception as e:
+            messagebox.showerror("Erro de Busca por CEP", str(e))
+            self.entryCEP.focus_set()
+
+    def cadastrar_usuario(self):
+        name = self.entryName.get()
+        birthdate = self.entryBirthdate.get()
+        cpf = self.entryCPF.get()
+        cep = self.entryCEP.get()
+        street = self.entryStreet.get()
+        number = self.entryNumber.get()
+        street2 = self.entryStreet2.get()
+        bairro = self.entryNeighborhood.get()
+        city = self.entryCity.get()
+        uf = self.entryUF.get()
+        phone = self.entryPhonenumber.get()
+        email = self.entryEmail.get()
+        login = self.entryUsername.get()
+        pwd = self.entryPassword.get()
+        pwd2 = self.entryPassword.get()
+        
+        usuario = Usuario(
+        nome = name,
+        cpf = cpf,
+        datanascimento = birthdate,
+        login = login,
+        senha = pwd
+        )
+        resultado = usuario.registrar_usuario(
+            telefone = phone,
+            email = email,
+            cep = cep,
+            logradouro = street,
+            numero = number,
+            complemento = street2,
+            bairro = bairro,
+            idcidade = 1
+        )
+        messagebox.showinfo("Sucesso", resultado)
 
     def open_login(self):
         self.destroy()
@@ -191,3 +295,7 @@ class Register(BaseApp):
 
     def run(self):
         self.mainloop()   
+
+controller = True
+app = Register(controller)
+app.mainloop()

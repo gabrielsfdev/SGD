@@ -1,6 +1,7 @@
 
 # Verifica se o CPF é válido, de acordo com o cálculo dos dígitos
 def valida_cpf(cpf):
+    cpf = cpf.replace('.','').replace('-','')
     if not cpf or len(cpf) != 11 or not cpf.isdigit() or cpf == cpf[0] * 11:
         raise ValueError("O CPF informado está incorreto. Deve conter 11 dígitos numéricos e não ser sequencial.")
 

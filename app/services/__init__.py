@@ -3,5 +3,6 @@
 from .usuario_service import Usuario
 from .sessao_service import Sessao
 from .arquivo_service import Arquivo
+from .mascara_service import Mascara
 
-__all__ = ['Usuario', 'Sessao', 'Arquivo']
+__all__ = ['Usuario', 'Sessao', 'Arquivo', 'Mascara']
