@@ -8,7 +8,7 @@ from app.utils import *
 from datetime import datetime
 import json
 
-def test_registrar_usuario(nome, cpf, data_nascimento, email, telefone, logradouro, numero, complemento, bairro, login, senha):
+def test_registrar_usuario(nome, cpf, data_nascimento, email, telefone, cep, logradouro, numero, complemento, bairro, login, senha):
     usuario = Usuario(
         nome = nome,
         cpf = cpf,
@@ -19,6 +19,7 @@ def test_registrar_usuario(nome, cpf, data_nascimento, email, telefone, logradou
     resultado = usuario.registrar_usuario(
         telefone = telefone,
         email = email,
+        cep = cep,
         logradouro = logradouro,
         numero = numero,
         complemento = complemento,
@@ -74,4 +75,4 @@ if __name__ == "__main__":
     login = input('Informe o login: ')
     senha = input('Informe a senha: ')
     
-    test_registrar_usuario(nome, cpf_validado, data_nascimento, email, telefone, logradouro, numero, complemento, bairro, login, senha)
+    test_registrar_usuario(nome, cpf_validado, data_nascimento, email, telefone, cep, logradouro, numero, complemento, bairro, login, senha)

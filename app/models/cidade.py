@@ -6,6 +6,6 @@ from .base import Base
 class CidadeBD(Base):
     __tablename__ = 'cidade'
     id = Column(Integer, primary_key=True)
-    nomecidade = Column(String(100))
+    nome_cidade = Column(String(100))
     uf = Column(String(2))
     enderecos = relationship('EnderecoBD', back_populates='cidade')

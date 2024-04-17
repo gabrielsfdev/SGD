@@ -81,7 +81,7 @@ class Login(BaseApp):
         )
         
         self.underline_text(self.cadastre)
-        self.bind_text_events(self.cadastre)
+        self.bind_text_events_login(self.cadastre)
         
 
         self.esqueci_minha_senha = self.canvas.create_text(
@@ -93,7 +93,7 @@ class Login(BaseApp):
             font=("AbhayaLibre Regular", 20 * -1)
         )
         self.underline_text(self.esqueci_minha_senha)
-        self.bind_text_events(self.esqueci_minha_senha)
+        self.bind_text_events_login(self.esqueci_minha_senha)
 
     def create_entries(self):
         self.entryUsername = inputField.criar_campo_de_entrada(self, 633.0, 349.0, 'Nome de Usuário')
@@ -131,19 +131,6 @@ class Login(BaseApp):
             width=25.0,
             height=25.0
         )
-
-    '''
-    def login(self):
-        username = self.entryUsername.get()
-        password = self.entryPassword.get()
-        result = self.controller.authenticate(username, password)
-        if result:
-            self.destroy()
-            from principalScreen import PagPrincipal
-            PagPrincipal(self).run()
-        else:
-            messagebox.showerror("Falha no Login", "Usuário ou senha inválida")
-    '''
     
     def login(self):
         username = self.entryUsername.get()
@@ -152,7 +139,7 @@ class Login(BaseApp):
         realizar_login = usuario.login_usuario()
         
         if realizar_login['success']:
-            messagebox.showinfo("Sucesso", realizar_login['message'] + f'Bem vindo {realizar_login['usuario'].nome}')
+            messagebox.showinfo('Sucesso', f'{realizar_login['message']}\nBem vindo {realizar_login['usuario'].nome_usuario}')
             self.destroy()
             from principalScreen import PagPrincipal
             PagPrincipal(self).run()
@@ -173,7 +160,7 @@ class Login(BaseApp):
         sessao = Sessao()
         if sessao.usuario_logado():
             usuario = sessao.carrega_sessao()
-            messagebox.showinfo("Sucesso", f"Bem-vindo {usuario['nome']}!")
+            messagebox.showinfo("Sucesso", f"Bem-vindo {usuario['nome_usuario']}!")
             self.destroy()
             from principalScreen import PagPrincipal
             PagPrincipal(self).run()
