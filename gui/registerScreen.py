@@ -287,6 +287,7 @@ class Register(BaseApp):
             idcidade = 1
         )
         messagebox.showinfo("Sucesso", resultado)
+        self.open_login()
 
     def open_login(self):
         self.destroy()
