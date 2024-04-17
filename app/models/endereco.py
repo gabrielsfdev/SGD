@@ -7,6 +7,7 @@ class EnderecoBD(Base):
     __tablename__ = 'endereco'
     id = Column(Integer, primary_key=True)
     idusuario = Column(Integer, ForeignKey('usuarios.id'))
+    cep = Column(String(9))
     logradouro = Column(String(200))
     numero = Column(String(10))
     complemento = Column(String(20), nullable=True)
