@@ -8,7 +8,6 @@ class Mascara:
         self.tamanho_max = tamanho_max
         self.entrada.bind("<KeyRelease>", self.evento)
         self.entrada.bind("<FocusIn>", self.on_focus_in)
-        self.entrada.bind("<Enter>", self.on_focus_in)
         self.entrada.bind("<FocusOut>", self.on_focus_out)
         self.set_placeholder()
         if self.tamanho_max:
@@ -22,6 +21,8 @@ class Mascara:
     def on_focus_in(self, event=None):
         if self.entrada.get() == self.placeholder:
             self.entrada.delete(0, "end")
+            self.entrada.insert(0, '') 
+            self.entrada.config(fg='black')
     
     def valida_tamanho(self, novo_texto):
         return len(novo_texto) <= self.tamanho_max

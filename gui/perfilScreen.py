@@ -124,7 +124,7 @@ class Perfil(BaseApp):
             fill="#FFFFFF",
             font=("Abel Regular", 14 * -1)
         )
-        self.bind_text_events(self.adicionar_foto)
+        self.bind_text_events_principal(self.adicionar_foto)
 
 
         self.image_voltar = PhotoImage(
