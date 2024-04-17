@@ -31,7 +31,7 @@ class Arquivo:
                 nome = os.path.basename(caminho_arquivo)
                 tipo = nome.split('.')[-1]
 
-                novo_arquivo = ArquivoBD(nome=nome, idusuario = id_usuario, tipo=tipo, tamanho=tamanho)
+                novo_arquivo = ArquivoBD(nome_arquivo=nome, idusuario=id_usuario, tipo_arquivo=tipo, tamanho_arquivo=tamanho)
                 self.db_session.add(novo_arquivo)
                 self.db_session.flush()
 

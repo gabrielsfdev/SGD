@@ -31,7 +31,7 @@ def fazer_login():
     print(realizar_login['message'])
     
     if realizar_login['success']:
-        print(f'Bem vindo {realizar_login['usuario'].nome}')
+        print(f'Bem vindo {realizar_login['usuario'].nome_usuario}')
         return realizar_login['usuario']
     
 

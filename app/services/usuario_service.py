@@ -15,8 +15,8 @@ class Usuario:
         with SessionLocal() as session:
             senha_hashed = bcrypt.hashpw(self.senha.encode(), bcrypt.gensalt())
             novo_usuario = UsuarioBD(
-                nome=self.nome,
-                cpf=self.cpf,
+                nome_usuario=self.nome,
+                cpf_usuario=self.cpf,
                 datanascimento=self.datanascimento,
                 login=self.login,
                 senha=senha_hashed.decode()
@@ -25,7 +25,7 @@ class Usuario:
             try:
                 session.flush()
                 
-                novo_telefone = TelefoneBD(telefone=telefone, idusuario=novo_usuario.id)
+                novo_telefone = TelefoneBD(numero_telefone=telefone, idusuario=novo_usuario.id)
                 novo_email = EmailBD(email=email, idusuario=novo_usuario.id)
                 novo_endereco = EnderecoBD(cep=cep, logradouro=logradouro, numero=numero, complemento=complemento, bairro=bairro, idcidade=idcidade, idusuario=novo_usuario.id)
                 
