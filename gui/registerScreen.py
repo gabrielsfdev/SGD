@@ -284,9 +284,9 @@ class Register(BaseApp):
             numero = number,
             complemento = street2,
             bairro = bairro,
-            idcidade = 1
+            cidade = city
         )
-        messagebox.showinfo("Sucesso", resultado)
+        messagebox.showinfo("Sucesso", resultado['message'])
         self.open_login()
 
     def open_login(self):

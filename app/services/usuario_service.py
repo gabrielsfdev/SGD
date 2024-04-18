@@ -1,6 +1,6 @@
 from sqlalchemy.exc import IntegrityError
 import bcrypt
-from app.models import UsuarioBD, EnderecoBD, TelefoneBD, EmailBD, ArquivoBD
+from app.models import UsuarioBD, EnderecoBD, TelefoneBD, EmailBD, CidadeBD
 from app.database import SessionLocal
 
 class Usuario:
@@ -11,7 +11,7 @@ class Usuario:
         self.cpf = cpf
         self.datanascimento = datanascimento
 
-    def registrar_usuario(self, telefone, email, cep, logradouro, numero, complemento, bairro, idcidade):
+    def registrar_usuario(self, telefone, email, cep, logradouro, numero, complemento, bairro, cidade):
         with SessionLocal() as session:
             senha_hashed = bcrypt.hashpw(self.senha.encode(), bcrypt.gensalt())
             novo_usuario = UsuarioBD(
@@ -25,9 +25,11 @@ class Usuario:
             try:
                 session.flush()
                 
+                id_cidade = session.query(CidadeBD).filter(CidadeBD.nome_cidade == cidade).first()
+                
                 novo_telefone = TelefoneBD(numero_telefone=telefone, idusuario=novo_usuario.id)
                 novo_email = EmailBD(email=email, idusuario=novo_usuario.id)
-                novo_endereco = EnderecoBD(cep=cep, logradouro=logradouro, numero=numero, complemento=complemento, bairro=bairro, idcidade=idcidade, idusuario=novo_usuario.id)
+                novo_endereco = EnderecoBD(cep=cep, logradouro=logradouro, numero=numero, complemento=complemento, bairro=bairro, idcidade=id_cidade.id, idusuario=novo_usuario.id)
                 
                 session.add(novo_telefone)
                 session.add(novo_email)
