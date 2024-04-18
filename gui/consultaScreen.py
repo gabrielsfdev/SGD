@@ -12,8 +12,19 @@ class Consulta(BaseTab):
     def create_notebook(self):
         self.notebook_style = ttk.Style()
         self.notebook_style.theme_create("CustomStyle", parent="alt", settings={
-            "TNotebook.Tab": {"configure": {"padding": [20, 5], "font": ('Abel Regular', 18), "foreground": "#006DFF",
-                                            "background": "#FFFFFF"}}})
+            "TNotebook.Tab": {
+                "configure": {
+                    "padding": [20, 5],
+                    "font": ('Abel Regular', 18),
+                    "foreground": "#006DFF",
+                    "background": "#FFFFFF"
+                },
+                "map": {
+                    "background": [("selected", "#006DFF")],
+                    "foreground": [("selected", "#FFFFFF")]
+                }
+            }
+        })
         self.notebook_style.theme_use("CustomStyle")
 
         self.notebook = ttk.Notebook(self.canvas)  # Adicionando o notebook como filho do canvas
@@ -61,3 +72,7 @@ class Consulta(BaseTab):
 
     def run(self):
         self.mainloop()
+
+controller = True
+app = Consulta(controller)
+app.mainloop()

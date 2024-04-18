@@ -1,9 +1,9 @@
 from tkinter import Button, PhotoImage
 import inputField
-from baseApp import BaseApp
+from photo import Photo
 
 
-class Perfil(BaseApp):
+class Perfil(Photo):
     def __init__(self, controller):
         super().__init__(controller)
         self.create_canvas()
@@ -178,5 +178,12 @@ class Perfil(BaseApp):
         open = PagPrincipal(self)
         open.run()
 
+    def open_adicionar_foto(self):
+        self.upload_image()
+
     def run(self):
         self.mainloop()
+
+controller = True
+app = Perfil(controller)
+app.mainloop()

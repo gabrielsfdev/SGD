@@ -9,7 +9,8 @@ from baseApp import BaseApp
 import inputField
 from app.services import Usuario
 from app.services import Mascara
-from app.utils import *
+from app.utils.cep_utilities import busca_cep, verifica_cep
+from app.utils.cpf_utilities import valida_cpf
 import json
 
 
@@ -144,27 +145,22 @@ class Register(BaseApp):
 
 
     def create_entries(self):
-        self.entryName = inputField.criar_campo_de_entrada(self, 100.0, 100.0, 'Nome Completo')
-        self.entryBirthdate = Mascara(self, formato="date", placeholder="Data de Nascimento", tamanho_max=8)
-        self.entryBirthdate.entrada.place(x=642.0, y=100.0, width=200, height=25)
-        self.entryCPF = Mascara(self, formato="cpf", placeholder="CPF", tamanho_max=11)
-        self.entryCPF.entrada.place(x=100.0, y=180.0, width=200, height=25)
-        self.entryCPF.entrada.bind("<FocusOut>", self.valida_cpf)
-        self.entryPhonenumber = Mascara(self, formato="telefone", placeholder="Telefone", tamanho_max=11)
-        self.entryPhonenumber.entrada.place(x=384.0, y=180.0, width=200, height=25)
-        self.entryCEP = Mascara(self, formato="cep", placeholder="CEP", tamanho_max=8)
-        self.entryCEP.entrada.place(x=668.0, y=180.0, width=200, height=25)
+        self.entryName = Mascara(self, formato='nome', x=100, y=100, texto='Nome Completo')
+        self.entryBirthdate = Mascara(self, formato="date", tamanho_max=8, x=642, y=100, texto='Data de Nascimento')
+        self.entryCPF = Mascara(self, formato="cpf", tamanho_max=11, x=100, y=180, texto='CPF', obrigatorio=True)
+        self.entryPhonenumber = Mascara(self, formato="telefone", tamanho_max=11, x=384, y=180, texto="Telefone")
+        self.entryCEP = Mascara(self, formato="cep", tamanho_max=8, x=668, y=180, texto='CEP', obrigatorio=True)
         self.entryCEP.entrada.bind("<FocusOut>", self.preenche_endereco)
-        self.entryStreet = inputField.criar_campo_de_entrada(self, 100.0, 280.0, 'Logradouro')
-        self.entryNumber = inputField.criar_campo_de_entrada(self, 536.0, 280.0, 'Número', width=80)
-        self.entryStreet2 = inputField.criar_campo_de_entrada(self, 690.0, 280.0, 'Complemento')
-        self.entryNeighborhood = inputField.criar_campo_de_entrada(self, 100.0, 360.0, 'Bairro')
-        self.entryCity = inputField.criar_campo_de_entrada(self, 433.0, 360.0, 'Cidade')
-        self.entryUF = inputField.criar_campo_de_entrada(self, 831.0, 360.0, 'UF', width=50)
-        self.entryUsername = inputField.criar_campo_de_entrada(self, 100.0, 460.0, 'Nome de Usuário', True)
-        self.entryEmail = inputField.criar_campo_de_entrada(self, 434.0, 460.0, 'E-mail', True)
-        self.entryPassword = inputField.criar_campo_de_entrada(self, 100.0, 540.0, 'Senha', True, True)
-        self.entryPasswordagain = inputField.criar_campo_de_entrada(self, 434.0, 540.0, 'Repetir Senha', True, True)
+        self.entryStreet = Mascara(self, formato='nome', x=100.0, y=280.0, texto='Logradouro')
+        self.entryNumber = Mascara(self, formato='nome', x=536.0, y=280.0, texto='Número', width=80)
+        self.entryStreet2 = Mascara(self, formato='nome', x=690.0, y=280.0, texto='Complemento')
+        self.entryNeighborhood = Mascara(self, formato='nome', x=100.0, y=360.0, texto='Bairro')
+        self.entryCity = Mascara(self, formato='nome', x=433.0, y=360.0, texto='Cidade')
+        self.entryUF = Mascara(self, formato='nome', x=831.0, y=360.0, texto='UF', width=50)
+        self.entryUsername = Mascara(self, formato='nome', x=100.0, y=460.0, texto='Nome de Usuário', obrigatorio=True)
+        self.entryEmail = Mascara(self, formato='nome', x=434.0, y=460.0, texto='E-mail', obrigatorio=True)
+        self.entryPassword = Mascara(self, formato='nome', x=100.0, y=540.0, texto='Senha', obrigatorio=True, senha=True)
+        self.entryPasswordagain = Mascara(self, formato='nome', x=434.0, y=540.0, texto='Repetir Senha', obrigatorio=True, senha=True)
 
     def create_buttons(self):
         self.image_voltar = PhotoImage(
@@ -189,7 +185,7 @@ class Register(BaseApp):
             image=self.image_cadastrar,
             borderwidth=0,
             highlightthickness=0,
-            command=self.cadastrar_usuario,
+            command=self.cadastrar_multiple_commands,
             relief="flat"
         )
         cadastrar.place(
@@ -198,19 +194,33 @@ class Register(BaseApp):
             width=189.0,
             height=50.0
         )
+    def cadastrar_multiple_commands(self):
+        if self.valida_cpf():
+            if self.verifica_cep():
+                self.cadastrar_usuario()
+
+    def verifica_cep(self, event=None):
+        cep = self.entryCEP.get('CEP')
+        try:
+            verifica_cep(cep)
+            return True
+        except ValueError as e:
+            messagebox.showerror('Erro de Verificação', e)
+            self.entryCEP.delete(0, tk.END)
+            self.entryCEP.focus_set()
         
     def valida_cpf(self, event=None):
-        cpf = self.entryCPF.get()
+        cpf = self.entryCPF.get('CPF')
         try:
             valida_cpf(cpf)
-            return
+            return True
         except ValueError as e:
             messagebox.showerror('Erro Validação CPF', e)
             self.entryCPF.delete(0, tk.END)
             self.entryCPF.focus_set()
 
     def preenche_endereco(self, event=None):
-        cep = self.entryCEP.get()
+        cep = self.entryCEP.get('CEP')
         try:
             dados_cep = busca_cep(cep)
             if dados_cep.status_code == 200:
@@ -235,19 +245,19 @@ class Register(BaseApp):
                     
                     self.entryStreet.delete(0, tk.END)
                     self.entryStreet.insert(0, json_cep['logradouro'])
-                    self.entryStreet.config(fg='black')
+                    self.entryStreet.entrada.config(fg='black')
                     
                     self.entryNeighborhood.delete(0, tk.END)
                     self.entryNeighborhood.insert(0, json_cep['bairro'])
-                    self.entryNeighborhood.config(fg='black')
+                    self.entryNeighborhood.entrada.config(fg='black')
                     
                     self.entryCity.delete(0, tk.END)
                     self.entryCity.insert(0, json_cep['localidade'])
-                    self.entryCity.config(fg='black')
+                    self.entryCity.entrada.config(fg='black')
                     
                     self.entryUF.delete(0, tk.END)
                     self.entryUF.insert(0, json_cep['uf'])
-                    self.entryUF.config(fg='black')
+                    self.entryUF.entrada.config(fg='black')
         except Exception as e:
             messagebox.showerror("Erro de Busca por CEP", str(e))
             self.entryCEP.focus_set()
@@ -284,10 +294,9 @@ class Register(BaseApp):
             numero = number,
             complemento = street2,
             bairro = bairro,
-            cidade = city
+            idcidade = 1
         )
-        messagebox.showinfo("Sucesso", resultado['message'])
-        self.open_login()
+        messagebox.showinfo("Sucesso", resultado)
 
     def open_login(self):
         self.destroy()

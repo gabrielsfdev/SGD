@@ -1,9 +1,10 @@
 from tkinter import Button, PhotoImage, Checkbutton, IntVar, messagebox
 import inputField
 from baseApp import BaseApp
-import os
 import sys
-sys.path.append(os.getenv('CAMINHO_RAIZ_PROJETO'))
+from pathlib import Path
+project_dir = Path(__file__).resolve().parent.parent
+sys.path.append(str(project_dir))
 from app.services import Usuario, Sessao
 from app.utils import *
 

@@ -1,15 +1,10 @@
 import tkinter as tk
 
 class Mascara:
-    def __init__(self, master, formato, placeholder="", tamanho_max=None, **kwargs):
-        self.entrada = tk.Entry(master, **kwargs)
+    def __init__(self, master, formato, tamanho_max=None, **kwargs):
         self.formato = formato
-        self.placeholder = placeholder
         self.tamanho_max = tamanho_max
-        self.entrada.bind("<KeyRelease>", self.evento)
-        self.entrada.bind("<FocusIn>", self.on_focus_in)
-        self.entrada.bind("<FocusOut>", self.on_focus_out)
-        self.set_placeholder()
+        self.criar_entrada(master, **kwargs)
         if self.tamanho_max:
             vcmd = (master.register(self.on_validate), '%P')
             self.entrada.config(validate="key", validatecommand=vcmd)
@@ -18,8 +13,8 @@ class Mascara:
         digits = ''.join(filter(str.isdigit, P))
         return len(digits) <= self.tamanho_max
 
-    def on_focus_in(self, event=None):
-        if self.entrada.get() == self.placeholder:
+    def on_focus_in(self, event, texto):
+        if self.entrada.get() == texto:
             self.entrada.delete(0, "end")
             self.entrada.insert(0, '') 
             self.entrada.config(fg='black')
@@ -27,14 +22,15 @@ class Mascara:
     def valida_tamanho(self, novo_texto):
         return len(novo_texto) <= self.tamanho_max
 
-    def evento(self, event=None):
-        texto_atual = ''.join(filter(str.isdigit, self.entrada.get()))
-        if texto_atual == self.placeholder:
-            self.entrada.delete(0, 'end')
-        novo_texto = self.aplica_mascara(texto_atual)
-        self.entrada.config(fg='black')
-        self.entrada.delete(0, tk.END)
-        self.entrada.insert(0, novo_texto)
+    def evento(self, event, texto):
+        if texto in ['Data de Nascimento', 'CPF*', 'CEP*', 'Telefone']:
+            texto_atual = ''.join(filter(str.isdigit, self.entrada.get()))
+            if texto_atual == texto:
+                self.entrada.delete(0, 'end')
+            novo_texto = self.aplica_mascara(texto_atual)
+            self.entrada.config(fg='black')
+            self.entrada.delete(0, tk.END)
+            self.entrada.insert(0, novo_texto)
 
     def aplica_mascara(self, texto):
         texto = ''.join(filter(str.isdigit, texto))
@@ -64,13 +60,12 @@ class Mascara:
                 texto = '(' + texto[:2] + ')' + texto[2:]
         return texto
 
-    def on_focus_out(self, event=None):
-        if not self.entrada.get():
-            self.set_placeholder()
-
-    def set_placeholder(self):
-        self.entrada.insert(0, self.placeholder)
-        self.entrada.config(fg='grey')
+    def on_focus_out(self, event, texto, senha):
+        if self.entrada.get() == '':
+            self.entrada.insert(0, texto)
+            self.entrada.config(fg='grey') # Muda a cor do texto para cinza
+            if senha:
+                self.entrada.config(show='')
 
     def delete(self, first, last=None):
         self.entrada.delete(first, last)
@@ -84,8 +79,23 @@ class Mascara:
     def grid(self, **kwargs):
         self.entrada.grid(**kwargs)
 
-    def get(self):
+    def get(self, texto):
         text = self.entrada.get()
-        if text == self.placeholder or not text.strip():
+        if text == texto or not text.strip():
             return ""
-        return self.entrada.get().strip()
+        return text.strip()
+    
+    def criar_entrada(self, master, x, y, texto, obrigatorio=False, senha=False, width=200, height=25):
+        self.entrada = tk.Entry(master, fg='grey', show='' if senha else None)
+        
+        # Adiciona um asterisco se o campo for obrigatório
+        if obrigatorio:
+            texto = texto + "*"
+
+        self.entrada.insert(0, texto)
+        self.entrada.bind("<KeyRelease>", lambda event: self.evento(event, texto))
+        self.entrada.bind('<FocusIn>', lambda event: self.on_focus_in(event, texto))
+        self.entrada.bind('<FocusOut>', lambda event: self.on_focus_out(event, texto, senha))
+        if senha:
+            self.entrada.bind('<Key>', lambda event: self.entrada.config(show='*'))    
+        self.entrada.place(x=x, y=y, width=width, height=height)
