@@ -28,13 +28,16 @@ class OCR_DOCS:
 
         self.extracted = pytesseract.image_to_string(imagem_cinza, lang='por', config='--psm 6')
     
-    def find_info(self, info):
-        regex = rf"{info} .+\n(.+)\b" # Exemplo de regex para buscar informação na linha de baixo
-        info_catched = re.findall(regex, self.extracted)
-        if info_catched:
-            return info_catched[0]
-        else:
-            return "Não encontrado"
+    def find_name(self):
+        regex = rf"nome (.+)"
+        name = re.findall(regex, self.extracted.lower())
+        # print("nome do regex", name)
+        if name:
+            return name[0].upper()
+
+    def extract_info(self):
+        if self.name == "":
+            self.name = self.find_name()
 if __name__ == "__main__":
     # Colocar Testagem em outro lugar em próxima sprint
     teste = OCR_DOCS("ambiente_virtual/rg_verso.jpg")
@@ -42,5 +45,5 @@ if __name__ == "__main__":
 
     print(teste.extracted)
     print('------------------------------------')
-    # teste.extract_info()
+    teste.extract_info()
     print(teste.mother_name)
