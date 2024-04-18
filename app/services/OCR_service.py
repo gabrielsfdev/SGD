@@ -36,13 +36,13 @@ class OCR_DOCS:
             return name[0].upper()
     
     def find_rg(self):
-        regex = r"registro.*?\b(\d{2}[.]\d{3}[.]\d{3}[-]\d{2})\b"
+        regex = r"registro (\d{2}[.]\d{3}[.]\d{3}[-]\d{2})"
         rg = re.findall(regex, self.extracted.lower(), re.DOTALL)
-        print("rg do regex", rg)
+        print("rg do regex", rg) # Apenas para debug
         if rg:
             return rg[0]
         else:
-            regex = r"registro.*?\b(\d{2}[.]\d{3}[.]\d{3}[-]\d{1})\b"
+            regex = r"registro (\d{2}[.]\d{3}[.]\d{3}[-]\d{1})\b"
             rg = re.findall(regex, self.extracted.lower(), re.DOTALL)
             if rg:
                 return rg[0]
@@ -50,13 +50,14 @@ class OCR_DOCS:
     def find_born_date(self):
         regex = r"nascimento.*?\s*(\d{2}[/]\d{2}[/]\d{4})"
         born_date = re.findall(regex, self.extracted.lower(), re.DOTALL)
-        print("nascimento do regex", born_date)
+        print("nascimento do regex", born_date) # Apenas para debug
         if born_date:
             return born_date[0]
         
     def find_mother_name(self):
-        regex = r"filiação.*?\b(.+)"
+        regex = r"filiação.*?\s*\n(.+)\b"
         mother_name = re.findall(regex, self.extracted.lower())
+        print("nome da mãe", mother_name) # Apenas para debug
         if mother_name:
             return mother_name[0].upper()
 
@@ -78,4 +79,4 @@ if __name__ == "__main__":
     print(teste.extracted)
     print('------------------------------------')
     teste.extract_info()
-    print(teste.mother_name)
+    # print(teste.mother_name)
