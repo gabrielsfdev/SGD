@@ -46,6 +46,19 @@ class OCR_DOCS:
             rg = re.findall(regex, self.extracted.lower(), re.DOTALL)
             if rg:
                 return rg[0]
+            
+    def find_born_date(self):
+        regex = r"nascimento.*?\s*(\d{2}[/]\d{2}[/]\d{4})"
+        born_date = re.findall(regex, self.extracted.lower(), re.DOTALL)
+        print("nascimento do regex", born_date)
+        if born_date:
+            return born_date[0]
+        
+    def find_mother_name(self):
+        regex = r"filiação.*?\b(.+)"
+        mother_name = re.findall(regex, self.extracted.lower())
+        if mother_name:
+            return mother_name[0].upper()
 
     def extract_info(self):
         if self.name == "":
@@ -54,13 +67,8 @@ class OCR_DOCS:
             self.Rg_id = self.find_rg()
         if self.born_date == "":
             self.born_date = self.find_born_date()
-    
-    def find_born_date(self):
-        regex = r"nascimento.*?\s*(\d{2}[/]\d{2}[/]\d{4})"
-        born_date = re.findall(regex, self.extracted.lower(), re.DOTALL)
-        print("nascimento do regex", born_date)
-        if born_date:
-            return born_date[0]
+        if self.mother_name == "": # Este não pode ser obrigatório
+            self.mother_name = self.find_mother_name()
 
 if __name__ == "__main__":
     # Colocar Testagem em outro lugar em próxima sprint
