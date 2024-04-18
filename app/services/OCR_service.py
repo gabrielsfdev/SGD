@@ -34,10 +34,25 @@ class OCR_DOCS:
         # print("nome do regex", name)
         if name:
             return name[0].upper()
+    
+    def find_rg(self):
+        regex = r"registro.*?\b(\d{2}[.]\d{3}[.]\d{3}[-]\d{2})\b"
+        rg = re.findall(regex, self.extracted.lower(), re.DOTALL)
+        print("rg do regex", rg)
+        if rg:
+            return rg[0]
+        else:
+            regex = r"registro.*?\b(\d{2}[.]\d{3}[.]\d{3}[-]\d{1})\b"
+            rg = re.findall(regex, self.extracted.lower(), re.DOTALL)
+            if rg:
+                return rg[0]
 
     def extract_info(self):
         if self.name == "":
             self.name = self.find_name()
+        if self.Rg_id == "":
+            self.Rg_id = self.find_rg()
+            
 if __name__ == "__main__":
     # Colocar Testagem em outro lugar em próxima sprint
     teste = OCR_DOCS("ambiente_virtual/rg_verso.jpg")
