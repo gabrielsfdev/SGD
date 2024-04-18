@@ -168,7 +168,3 @@ class Login(BaseApp):
             controller = True
             app = Login(controller)
             app.mainloop()
-            
-controller = True
-app = Login(controller)
-app.main()
