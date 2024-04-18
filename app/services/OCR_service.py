@@ -9,7 +9,7 @@ class OCR_DOCS:
         self.img = format_identificator(img_path)
         self.extracted = ""
         self.name = ""
-        self.Rg_id = ""
+        self.rg_id = ""
         self.born_date = ""
         self.mother_name = ""
         self.place_of_birth = ""
