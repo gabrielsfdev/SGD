@@ -12,7 +12,6 @@ class OCR_DOCS:
         self.Rg_id = ""
         self.born_date = ""
         self.mother_name = ""
-        self.father_name = ""
         self.place_of_birth = ""
         self.date_of_issue = ""
         
@@ -55,11 +54,16 @@ class OCR_DOCS:
             return born_date[0]
         
     def find_mother_name(self):
-        regex = r"filiação.*?\s*\n(.+)\b"
+        regex = r"filiação.*?\s*\n(.+)"
         mother_name = re.findall(regex, self.extracted.lower())
         print("nome da mãe", mother_name) # Apenas para debug
         if mother_name:
             return mother_name[0].upper()
+    
+    def find_place_of_birth(self):
+        regex = r"naturalidade.*?\n([^\s]+) "
+        place_of_birth = re.findall(regex, self.extracted.lower())
+        return place_of_birth[0].upper()
 
     def extract_info(self):
         if self.name == "":
@@ -70,13 +74,8 @@ class OCR_DOCS:
             self.born_date = self.find_born_date()
         if self.mother_name == "": # Este não pode ser obrigatório
             self.mother_name = self.find_mother_name()
+        if self.place_of_birth == "":
+            self.place_of_birth = self.find_place_of_birth()
 
-if __name__ == "__main__":
-    # Colocar Testagem em outro lugar em próxima sprint
-    teste = OCR_DOCS("ambiente_virtual/rg_verso.jpg")
-    teste.new_rg()
-
-    print(teste.extracted)
-    print('------------------------------------')
-    teste.extract_info()
-    # print(teste.mother_name)
+        if not all([self.name, self.Rg_id, self.born_date, self.mother_name, self.place_of_birth]):
+            return "Fazer modificações na imagem e tentar novamente"
