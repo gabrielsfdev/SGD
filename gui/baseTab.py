@@ -1,6 +1,11 @@
 from tkinter import Canvas, PhotoImage, Button
 import inputField
 from baseApp import BaseApp
+import sys
+from pathlib import Path
+project_dir = Path(__file__).resolve().parent.parent
+sys.path.append(str(project_dir))
+from app.services import Mascara
 
 class BaseTab(BaseApp):
     def create_canvas_in_tab(self, tab, tab_name):
@@ -84,5 +89,5 @@ class BaseTab(BaseApp):
         )
     def add_entry_in_tab(self, tab, tab_name):
         # Cria uma caixa de entrada (entry) na mesma posição onde a imagem foi desenhada
-        entry = inputField.criar_campo_de_entrada(tab, 320, 355, tab_name)
+        entry = Mascara(tab, formato='nome', x=320.0, y=355.0, texto=tab_name)
         return entry
