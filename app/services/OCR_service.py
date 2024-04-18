@@ -13,7 +13,6 @@ class OCR_DOCS:
         self.born_date = ""
         self.mother_name = ""
         self.place_of_birth = ""
-        self.date_of_issue = ""
         
 
     def new_rg(self):
