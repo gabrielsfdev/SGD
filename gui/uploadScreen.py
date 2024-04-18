@@ -1,5 +1,10 @@
-from tkinter import Button, PhotoImage
+import sys
+from pathlib import Path
+project_dir = Path(__file__).resolve().parent.parent
+sys.path.append(str(project_dir))
+from tkinter import Button, PhotoImage, filedialog, messagebox
 from baseApp import BaseApp
+from app.services import Arquivo
 
 
 class Upload(BaseApp):
@@ -22,7 +27,7 @@ class Upload(BaseApp):
             image=self.image_escolha_um_arquivo,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: print("escolha_um_arquivo clicked"),
+            command=self.janela_selecao,
             relief="flat"
         )
         self.escolha_um_arquivo.place(
@@ -38,7 +43,7 @@ class Upload(BaseApp):
             image=self.image_fazer_upload,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: print("fazer_upload clicked"),
+            command=self.upload,
             relief="flat"
         )
         self.fazer_upload.place(
@@ -82,6 +87,33 @@ class Upload(BaseApp):
             font=("AbhayaLibre Regular", 40 * -1)
         )
 
+    def janela_selecao(self):
+        """ Esta função abre a janela de diálogo para selecionar um arquivo """
+        caminho_arquivo = filedialog.askopenfilename(
+            title="Selecionar Arquivo",
+            filetypes=(("Arquivos PDF", "*.pdf"), ("Arquivos de Imagem", ['*.jpg','*.jpeg','*.png']))  # Tipos de arquivo
+        )
+        if caminho_arquivo:
+            self.caminho_arquivo = caminho_arquivo
+            print(f"Arquivo selecionado: {caminho_arquivo}")
+        else:
+            print("Nenhum arquivo foi selecionado.")
+    
+    def upload(self):
+        salva_arquivo = Arquivo()
+        try:
+            result = salva_arquivo.upload_arquivo(self.caminho_arquivo)
+            messagebox.showinfo('Sucesso', result['message'])
+            self.destroy()
+            open = Upload(self)
+            open.run()
+        except:
+            messagebox.showerror("Falha no Upload", result)
+            self.destroy()
+            from loginScreen import Login
+            open = Login(self)
+            open.run()
+
     def open_principal(self):
         self.destroy()
         from principalScreen import PagPrincipal
@@ -90,3 +122,7 @@ class Upload(BaseApp):
 
     def run(self):
         self.mainloop()
+        
+controller = True
+app = Upload(controller)
+app.mainloop()

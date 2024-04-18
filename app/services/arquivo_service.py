@@ -39,10 +39,48 @@ class Arquivo:
                 self.db_session.add(blob_arquivo)
 
                 self.db_session.commit()
-
-                return blob_arquivo.id
+                
+                return {'success': True, 'message': 'Arquivo salvo com sucesso!', 'nome': nome}
 
         except Exception as e:
             self.db_session.rollback()
-            print(f"Erro ao fazer upload do arquivo: {e}")
-            return None
+            return f"Erro ao fazer upload do arquivo: {e}"
+    
+    def busca_arquivo(self, param_busca, texto):
+        session = SessionLocal()
+        try:
+            if hasattr(ArquivoBD, param_busca):
+                filtro = getattr(ArquivoBD, param_busca)
+                busca = session.query(ArquivoBD).filter(filtro.contains(texto)).all()
+                if busca:
+                    return {'success': True, 'message': 'Arquivos encontrados.', 'arquivos': busca}
+                else:
+                    return {'success': False, 'message': 'Nenhum arquivo encontrado.'}
+            else:
+                return {'success': False, 'message': 'Coluna de busca inválida.'}
+        finally:
+            session.close()
+    
+    def download_arquivo(self, id, nome):
+        session = SessionLocal()
+        try:
+            busca = session.query(ArquivoBlobBD).filter(ArquivoBlobBD.idarquivo == id).first()
+            if busca:
+                print("Por favor, informe o caminho completo onde deseja salvar o arquivo:")
+                caminho = input("Caminho: ")
+                if not caminho:
+                    return {'success': False, 'message': 'Caminho não fornecido. Download cancelado.'}
+                
+                if caminho[-1] != '\\':
+                    caminho += '\\'
+
+                caminho += nome
+
+                with open(caminho, 'wb') as f:
+                    f.write(busca.blob_dados)
+
+                return {'success': True, 'message': 'Arquivo salvo com sucesso!', 'caminho': caminho}
+            else:
+                return {'success': False, 'message': 'Nenhum arquivo encontrado.'}
+        finally:
+            session.close()
