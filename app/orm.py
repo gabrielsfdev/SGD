@@ -3,7 +3,6 @@ from pathlib import Path
 project_dir = Path(__file__).resolve().parent.parent
 sys.path.append(str(project_dir))
 from app import *
-from app.models import Base
 from app.models import *
 
 def init_db():
@@ -12,3 +11,5 @@ def init_db():
 if __name__ == "__main__":
     init_db()
     popula_tabela_cidade()
+    insere_perfis()
+    cadastra_adm()

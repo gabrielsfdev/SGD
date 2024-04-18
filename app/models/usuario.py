@@ -24,10 +24,13 @@ class UsuarioBD(Base):
     escritoriousuario = relationship('EscritorioUsuarioBD', back_populates='usuario')
     
     def dados_usuario(self):
+        perfis = [{'idperfil': perfil.id} for perfil in self.perfilusuario]
+        
         return {
             'id': self.id,
             'nome_usuario': self.nome_usuario,
             'login': self.login,
             'data_nascimento': self.datanascimento.strftime('%Y-%m-%d') if self.datanascimento else None,
-            'cpf_usuario': self.cpf_usuario
+            'cpf_usuario': self.cpf_usuario,
+            'perfis': perfis
         }
