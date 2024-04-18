@@ -52,7 +52,16 @@ class OCR_DOCS:
             self.name = self.find_name()
         if self.Rg_id == "":
             self.Rg_id = self.find_rg()
-            
+        if self.born_date == "":
+            self.born_date = self.find_born_date()
+    
+    def find_born_date(self):
+        regex = r"nascimento.*?\s*(\d{2}[/]\d{2}[/]\d{4})"
+        born_date = re.findall(regex, self.extracted.lower(), re.DOTALL)
+        print("nascimento do regex", born_date)
+        if born_date:
+            return born_date[0]
+
 if __name__ == "__main__":
     # Colocar Testagem em outro lugar em próxima sprint
     teste = OCR_DOCS("ambiente_virtual/rg_verso.jpg")
