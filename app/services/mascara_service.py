@@ -22,8 +22,8 @@ class Mascara:
     def valida_tamanho(self, novo_texto):
         return len(novo_texto) <= self.tamanho_max
 
-    def evento(self, event, texto):
-        if texto in ['Data de Nascimento', 'CPF*', 'CEP*', 'Telefone']:
+    def evento(self, event, formato, texto):
+        if formato in ['date', 'cpf', 'cep', 'telefone']:
             texto_atual = ''.join(filter(str.isdigit, self.entrada.get()))
             if texto_atual == texto:
                 self.entrada.delete(0, 'end')
@@ -80,8 +80,13 @@ class Mascara:
         self.entrada.grid(**kwargs)
 
     def get(self, texto):
+        list_placeholder = [
+            'Nome Completo','Data de Nascimento','CPF','CPF*',
+            'Telefone','CEP','CEP*','Logradouro','Número','Complemento','Bairro',
+            'Cidade','UF','Nome de Usuário','E-mail','Senha','Repetir Senha'
+            ]
         text = self.entrada.get()
-        if text == texto or not text.strip():
+        if text == texto and text in list_placeholder:
             return ""
         return text.strip()
     
@@ -89,11 +94,11 @@ class Mascara:
         self.entrada = tk.Entry(master, fg='grey', show='' if senha else None)
         
         # Adiciona um asterisco se o campo for obrigatório
-        if obrigatorio:
+        if obrigatorio and texto in ['Data de Nascimento', 'CPF', 'CEP', 'Telefone']:
             texto = texto + "*"
 
         self.entrada.insert(0, texto)
-        self.entrada.bind("<KeyRelease>", lambda event: self.evento(event, texto))
+        self.entrada.bind("<KeyRelease>", lambda event: self.evento(event, self.formato, texto))
         self.entrada.bind('<FocusIn>', lambda event: self.on_focus_in(event, texto))
         self.entrada.bind('<FocusOut>', lambda event: self.on_focus_out(event, texto, senha))
         if senha:

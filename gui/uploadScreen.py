@@ -88,7 +88,6 @@ class Upload(BaseApp):
         )
 
     def janela_selecao(self):
-        """ Esta função abre a janela de diálogo para selecionar um arquivo """
         caminho_arquivo = filedialog.askopenfilename(
             title="Selecionar Arquivo",
             filetypes=(("Arquivos PDF", "*.pdf"), ("Arquivos de Imagem", ['*.jpg','*.jpeg','*.png']))  # Tipos de arquivo
@@ -122,7 +121,3 @@ class Upload(BaseApp):
 
     def run(self):
         self.mainloop()
-        
-controller = True
-app = Upload(controller)
-app.mainloop()
