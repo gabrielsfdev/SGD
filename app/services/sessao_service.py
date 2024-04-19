@@ -35,3 +35,15 @@ class Sessao:
     def usuario_logado(self):
         """Verifica se existe uma sessão ativa."""
         return os.path.exists(self.arquivo)
+    
+    def valida_perfil(self):
+        usuario = self.carrega_sessao()
+        idperfil = 3
+        if usuario is not None:
+            for i in range(len(usuario['perfis'])):
+                if usuario['perfis'][i]['idperfil'] == 1:
+                    idperfil = 1
+                    break
+                elif usuario['perfis'][i]['idperfil'] == 2:
+                    idperfil = 2
+            return idperfil

@@ -1,5 +1,10 @@
-from tkinter import Canvas, Tk
+import sys
 from pathlib import Path
+project_dir = Path(__file__).resolve().parent.parent
+sys.path.append(str(project_dir))
+from tkinter import Canvas, Tk, messagebox
+from pathlib import Path
+from app.services import Sessao
 
 class BaseApp(Tk):
     def __init__(self, controller):
@@ -47,6 +52,13 @@ class BaseApp(Tk):
         if text_id == self.adicionar_foto:
             self.open_adicionar_foto()
         elif text_id == self.desconectar:
+            sessao = Sessao()
+            if sessao.usuario_logado():
+                if sessao.limpa_sessao():
+                    messagebox.showinfo('Sucesso', 'Logout realizado com sucesso.')
+                else:
+                    messagebox.showerror('Falha', 'Erro ao realizar o logout. Tente novamente.')
+            self.destroy
             self.open_login()                
         elif text_id == self.upload_documentos:
             self.open_upload_documentos()

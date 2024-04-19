@@ -18,6 +18,7 @@ class Login(BaseApp):
         self.create_buttons()
         self.criar_imagem()
         self.criar_texto()
+        self.main()
     
     def draw_rectangle(self):
         self.canvas.create_rectangle(0, 0, 502.0, 768.0, fill="#006DFF", outline="")
@@ -165,7 +166,3 @@ class Login(BaseApp):
             self.destroy()
             from principalScreen import PagPrincipal
             PagPrincipal(self).run()
-        else:
-            controller = True
-            app = Login(controller)
-            app.mainloop()

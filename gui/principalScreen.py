@@ -1,9 +1,17 @@
 from tkinter import PhotoImage
 from baseApp import BaseApp
+import sys
+from pathlib import Path
+project_dir = Path(__file__).resolve().parent.parent
+sys.path.append(str(project_dir))
+from app.services import Sessao
+from app.utils import *
 
 class PagPrincipal(BaseApp):
     def __init__(self, controller):
         super().__init__(controller)
+        self.perfil_usuario()
+        self.posicao_botoes()
         self.create_canvas()
         self.draw_rectangle()
         self.criar_imagem()
@@ -68,83 +76,96 @@ class PagPrincipal(BaseApp):
         self.bind_text_events_principal(self.desconectar)
 
         self.editar_perfil = self.canvas.create_text(
-            23.0,
-            227.114501953125,
+            self.posicaobotoes[self.qtdbotoes]['x'],
+            self.posicaobotoes[self.qtdbotoes]['y'],
             anchor="nw",
             text="Editar Perfil",
             fill="#FFFFFF",
             font=("Abel Regular", 24 * -1)
         )
+        self.qtdbotoes += 1
         self.bind_text_events_principal(self.editar_perfil)
 
-        self.painel_central = self.canvas.create_text(
-            23.0,
-            278.114501953125,
-            anchor="nw",
-            text="Painel Central",
-            fill="#FFFFFF",
-            font=("Abel Regular", 24 * -1)
-        )
-        self.bind_text_events_principal(self.painel_central)
-
-        self.consultar_documentos = self.canvas.create_text(
-            21.0,
-            329.114501953125,
-            anchor="nw",
-            text="Consultar Documentos",
-            fill="#FFFFFF",
-            font=("Abel Regular", 24 * -1)
-        )
-        self.bind_text_events_principal(self.consultar_documentos)
+        if self.perfilusuario != 3:
+            self.painel_central = self.canvas.create_text(
+                self.posicaobotoes[self.qtdbotoes]['x'],
+                self.posicaobotoes[self.qtdbotoes]['y'],
+                anchor="nw",
+                text="Painel Central",
+                fill="#FFFFFF",
+                font=("Abel Regular", 24 * -1)
+            )
+            self.qtdbotoes += 1
+            self.bind_text_events_principal(self.painel_central)
+        
+        if self.perfilusuario != 3:
+            self.consultar_documentos = self.canvas.create_text(
+                self.posicaobotoes[self.qtdbotoes]['x'],
+                self.posicaobotoes[self.qtdbotoes]['y'],
+                anchor="nw",
+                text="Consultar Documentos",
+                fill="#FFFFFF",
+                font=("Abel Regular", 24 * -1)
+            )
+            self.qtdbotoes += 1
+            self.bind_text_events_principal(self.consultar_documentos)
 
         self.upload_documentos = self.canvas.create_text(
-            21.0,
-            380.114501953125,
+            self.posicaobotoes[self.qtdbotoes]['x'],
+            self.posicaobotoes[self.qtdbotoes]['y'],
             anchor="nw",
             text="Upload de Documentos",
             fill="#FFFFFF",
             font=("Abel Regular", 24 * -1)
         )
+        self.qtdbotoes += 1
         self.bind_text_events_principal(self.upload_documentos)
 
-        self.compartilhamentos = self.canvas.create_text(
-            23.0,
-            431.114501953125,
-            anchor="nw",
-            text="Compartilhamentos",
-            fill="#FFFFFF",
-            font=("Abel Regular", 24 * -1)
-        )
-        self.bind_text_events_principal(self.compartilhamentos)
+        if self.perfilusuario != 3:
+            self.compartilhamentos = self.canvas.create_text(
+                self.posicaobotoes[self.qtdbotoes]['x'],
+                self.posicaobotoes[self.qtdbotoes]['y'],
+                anchor="nw",
+                text="Compartilhamentos",
+                fill="#FFFFFF",
+                font=("Abel Regular", 24 * -1)
+            )
+            self.qtdbotoes += 1
+            self.bind_text_events_principal(self.compartilhamentos)
 
-        self.notificacoes = self.canvas.create_text(
-            23.0,
-            482.114501953125,
-            anchor="nw",
-            text="Notificações e Alertas",
-            fill="#FFFFFF",
-            font=("Abel Regular", 24 * -1)
-        )
-        self.bind_text_events_principal(self.notificacoes)
+        if self.perfilusuario != 3:
+            self.notificacoes = self.canvas.create_text(
+                self.posicaobotoes[self.qtdbotoes]['x'],
+                self.posicaobotoes[self.qtdbotoes]['y'],
+                anchor="nw",
+                text="Notificações e Alertas",
+                fill="#FFFFFF",
+                font=("Abel Regular", 24 * -1)
+            )
+            self.qtdbotoes += 1
+            self.bind_text_events_principal(self.notificacoes)
 
-        self.historico = self.canvas.create_text(
-            23.0,
-            533.0,
-            anchor="nw",
-            text="Histórico",
-            fill="#FFFFFF",
-            font=("Abel Regular", 24 * -1)
-        )
-        self.bind_text_events_principal(self.historico)
+        if self.perfilusuario != 3:
+            self.historico = self.canvas.create_text(
+                self.posicaobotoes[self.qtdbotoes]['x'],
+                self.posicaobotoes[self.qtdbotoes]['y'],
+                anchor="nw",
+                text="Histórico",
+                fill="#FFFFFF",
+                font=("Abel Regular", 24 * -1)
+            )
+            self.qtdbotoes += 1
+            self.bind_text_events_principal(self.historico)
 
         self.ajuda = self.canvas.create_text(
-            23.0,
-            584.0,
+            self.posicaobotoes[self.qtdbotoes]['x'],
+            self.posicaobotoes[self.qtdbotoes]['y'],
             anchor="nw",
             text="Ajuda",
             fill="#FFFFFF",
             font=("Abel Regular", 24 * -1)
         )
+        self.qtdbotoes += 1
         self.bind_text_events_principal(self.ajuda)
     
     def criar_texto(self):
@@ -180,6 +201,23 @@ class PagPrincipal(BaseApp):
         from consultaScreen import Consulta
         open = Consulta(self)
         open.run()
+    
+    def perfil_usuario(self):
+        perfil = Sessao()
+        self.perfilusuario = perfil.valida_perfil()
+        
+    def posicao_botoes(self):
+        self.posicaobotoes = [
+            {'x': 23.0, 'y': 227.114501953125},
+            {'x': 23.0, 'y': 278.114501953125},
+            {'x': 21.0, 'y': 329.114501953125},
+            {'x': 21.0, 'y': 380.114501953125},
+            {'x': 23.0, 'y': 431.114501953125},
+            {'x': 23.0, 'y': 482.114501953125},
+            {'x': 23.0, 'y': 533.0},
+            {'x': 23.0, 'y': 584.0}
+        ]
+        self.qtdbotoes = 0
 
     def run(self):
         self.mainloop()
