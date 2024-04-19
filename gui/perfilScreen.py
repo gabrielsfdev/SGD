@@ -1,11 +1,20 @@
-from tkinter import Button, PhotoImage
-import inputField
+from tkinter import Button, PhotoImage, messagebox
+import tkinter as tk
 from photo import Photo
+import sys
+from pathlib import Path
+project_dir = Path(__file__).resolve().parent.parent
+sys.path.append(str(project_dir))
+from app.services import Sessao, Mascara, AtualizaCadastro
+from app.utils.cep_utilities import busca_cep, verifica_cep
+from app.utils.cpf_utilities import valida_cpf
+import json
 
 
 class Perfil(Photo):
     def __init__(self, controller):
         super().__init__(controller)
+        self.recupera_usuario()
         self.create_canvas()
         self.draw_rectangle()
         self.criar_imagem()
@@ -149,7 +158,7 @@ class Perfil(Photo):
             image=self.image_salvar,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: print("salvar clicked"),
+            command=self.salvar_multiple_commands,
             relief="flat"
         )
         self.salvar.place(
@@ -159,18 +168,19 @@ class Perfil(Photo):
             height=50.0
         )
 
-    def create_entries(self):
-        self.entryName = inputField.criar_campo_de_entrada(self, 100.0, 268.0, 'Nome Completo')
-        self.entryBirthdate = inputField.criar_campo_de_entrada(self, 642.0, 268.0, 'Data de Nascimento')
-        self.entryCPF = inputField.criar_campo_de_entrada(self, 100.0, 348.0, 'CPF')
-        self.entryPhonenumber = inputField.criar_campo_de_entrada(self, 384.0, 348.0, 'Telefone')
-        self.entryCEP = inputField.criar_campo_de_entrada(self, 668.0, 348.0, 'CEP')
-        self.entryStreet = inputField.criar_campo_de_entrada(self, 100.0, 448.0, 'Logradouro')
-        self.entryNumber = inputField.criar_campo_de_entrada(self, 536.0, 448.0, 'Número', width=80)
-        self.entryStreet2 = inputField.criar_campo_de_entrada(self, 690.0, 448.0, 'Complemento')
-        self.entryNeighborhood = inputField.criar_campo_de_entrada(self, 100.0, 528.0, 'Bairro')
-        self.entryCity = inputField.criar_campo_de_entrada(self, 433.0, 528.0, 'Cidade')
-        self.entryUF = inputField.criar_campo_de_entrada(self, 831.0, 528.0, 'UF', width=50)
+    def create_entries(self):        
+        self.entryName = Mascara(self, formato='nome', x=100, y=268.0, texto=self.dados_usuario.nome_usuario)
+        self.entryBirthdate = Mascara(self, formato="date", tamanho_max=8, x=642, y=268.0, texto=self.dados_usuario.datanascimento.strftime('%d/%m/%Y'))
+        self.entryCPF = Mascara(self, formato="cpf", tamanho_max=11, x=100, y=348.0, texto=self.dados_usuario.cpf_usuario, obrigatorio=True)
+        self.entryPhonenumber = Mascara(self, formato="telefone", tamanho_max=11, x=384, y=348.0, texto=self.dados_usuario.numero_telefone)
+        self.entryCEP = Mascara(self, formato="cep", tamanho_max=8, x=668, y=348, texto=self.dados_usuario.cep, obrigatorio=True)
+        self.entryCEP.entrada.bind("<FocusOut>", self.preenche_endereco)
+        self.entryStreet = Mascara(self, formato='nome', x=100.0, y=448.0, texto=self.dados_usuario.logradouro)
+        self.entryNumber = Mascara(self, formato='nome', x=536.0, y=448.0, texto=self.dados_usuario.numero, width=80)
+        self.entryStreet2 = Mascara(self, formato='nome', x=690.0, y=448.0, texto=self.dados_usuario.complemento)
+        self.entryNeighborhood = Mascara(self, formato='nome', x=100.0, y=528.0, texto=self.dados_usuario.bairro)
+        self.entryCity = Mascara(self, formato='nome', x=433.0, y=528.0, texto=self.dados_usuario.nome_cidade)
+        self.entryUF = Mascara(self, formato='nome', x=831.0, y=528.0, texto=self.dados_usuario.uf, width=50)
 
     def open_principal(self):
         self.destroy()
@@ -180,6 +190,104 @@ class Perfil(Photo):
 
     def open_adicionar_foto(self):
         self.upload_image()
+        
+    def recupera_usuario(self):
+        usuario = Sessao()
+        try:
+            dados_usuario = usuario.recupera_dados()
+            self.dados_usuario = dados_usuario['usuario']
+        except:
+            messagebox.showerror("Falha", dados_usuario)
+            self.open_principal
+            
+    def salvar_multiple_commands(self):
+        if self.valida_cpf():
+            if self.verifica_cep():
+                self.atualizar_usuario()
+
+    def verifica_cep(self, event=None):
+        cep = self.entryCEP.get('CEP')
+        try:
+            verifica_cep(cep)
+            return True
+        except ValueError as e:
+            messagebox.showerror('Erro de Verificação', e)
+            self.entryCEP.delete(0, tk.END)
+            self.entryCEP.focus_set()
+            
+    def valida_cpf(self, event=None):
+        cpf = self.entryCPF.get('CPF')
+        try:
+            valida_cpf(cpf)
+            return True
+        except ValueError as e:
+            messagebox.showerror('Erro Validação CPF', e)
+            self.entryCPF.delete(0, tk.END)
+            self.entryCPF.focus_set()
+
+    def preenche_endereco(self, event=None):
+        cep = self.entryCEP.get('CEP')
+        try:
+            dados_cep = busca_cep(cep)
+            if dados_cep.status_code == 200:
+                json_cep = json.loads(dados_cep.content.decode('utf-8'))
+                
+                if len(json_cep) == 1:
+                    messagebox.showerror('CEP não localizado', 'CEP não localizado. Preencha o endereço manualmente')
+                    cep = cep[:5] + '-' + cep[5:]
+                    
+                    self.entryCEP.delete(0, tk.END)
+                    self.entryCEP.insert(0, cep)
+                    self.entryStreet.delete(0, tk.END)
+                    self.entryNeighborhood.delete(0, tk.END)
+                    self.entryCity.delete(0, tk.END)
+                    self.entryCity.delete(0, tk.END)
+                    self.entryUF.delete(0, tk.END)
+                    
+                    self.entryStreet.focus_set()
+                else:
+                    self.entryCEP.delete(0, tk.END)
+                    self.entryCEP.insert(0, json_cep['cep'])
+                    
+                    self.entryStreet.delete(0, tk.END)
+                    self.entryStreet.insert(0, json_cep['logradouro'])
+                    self.entryStreet.entrada.config(fg='black')
+                    
+                    self.entryNeighborhood.delete(0, tk.END)
+                    self.entryNeighborhood.insert(0, json_cep['bairro'])
+                    self.entryNeighborhood.entrada.config(fg='black')
+                    
+                    self.entryCity.delete(0, tk.END)
+                    self.entryCity.insert(0, json_cep['localidade'])
+                    self.entryCity.entrada.config(fg='black')
+                    
+                    self.entryUF.delete(0, tk.END)
+                    self.entryUF.insert(0, json_cep['uf'])
+                    self.entryUF.entrada.config(fg='black')
+        except Exception as e:
+            messagebox.showerror("Erro de Busca por CEP", str(e))
+            self.entryCEP.focus_set()
+    
+    def atualizar_usuario(self):
+        novos_dados = {
+        'nome_usuario': self.entryName.get(self.dados_usuario.nome_usuario),
+        'datanascimento': self.entryBirthdate.get(self.dados_usuario.datanascimento.strftime('%d/%m/%Y')),
+        'cpf_usuario': self.entryCPF.get(self.dados_usuario.cpf_usuario),
+        'numero_telefone': self.entryPhonenumber.get(self.dados_usuario.numero_telefone),
+        'cep': self.entryCEP.get(self.dados_usuario.cep),
+        'logradouro': self.entryStreet.get(self.dados_usuario.logradouro),
+        'numero': self.entryNumber.get(self.dados_usuario.numero),
+        'complemento': self.entryStreet2.get(self.dados_usuario.complemento),
+        'bairro': self.entryNeighborhood.get(self.dados_usuario.bairro),
+        'nome_cidade': self.entryCity.get(self.dados_usuario.nome_cidade),
+        'uf': self.entryUF.get(self.dados_usuario.uf)
+        }
+        atualiza = AtualizaCadastro()
+        try:
+            update = atualiza.atualiza_cadastro(self.dados_usuario, novos_dados)
+            messagebox.showinfo(update)
+        except:
+            messagebox.showerror("Falha", update)
 
     def run(self):
         self.mainloop()

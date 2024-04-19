@@ -4,9 +4,7 @@ project_dir = Path(__file__).resolve().parent.parent
 sys.path.append(str(project_dir))
 import tkinter as tk
 from tkinter import Button, PhotoImage, messagebox
-import inputField
 from baseApp import BaseApp
-import inputField
 from app.services import Usuario
 from app.services import Mascara
 from app.utils.cep_utilities import busca_cep, verifica_cep
@@ -263,21 +261,19 @@ class Register(BaseApp):
             self.entryCEP.focus_set()
 
     def cadastrar_usuario(self):
-        name = self.entryName.get()
-        birthdate = self.entryBirthdate.get()
-        cpf = self.entryCPF.get()
-        cep = self.entryCEP.get()
-        street = self.entryStreet.get()
-        number = self.entryNumber.get()
-        street2 = self.entryStreet2.get()
-        bairro = self.entryNeighborhood.get()
-        city = self.entryCity.get()
-        uf = self.entryUF.get()
-        phone = self.entryPhonenumber.get()
-        email = self.entryEmail.get()
-        login = self.entryUsername.get()
-        pwd = self.entryPassword.get()
-        pwd2 = self.entryPassword.get()
+        name = self.entryName.get('Nome Completo')
+        birthdate = self.entryBirthdate.get('Data de Nascimento')
+        cpf = self.entryCPF.get('CPF*')
+        cep = self.entryCEP.get('CEP')
+        street = self.entryStreet.get('Logradouro')
+        number = self.entryNumber.get('Número')
+        street2 = self.entryStreet2.get('Complemento')
+        bairro = self.entryNeighborhood.get('Bairro')
+        city = self.entryCity.get('Cidade')
+        phone = self.entryPhonenumber.get('Telefone')
+        email = self.entryEmail.get('E-mail')
+        login = self.entryUsername.get('Nome de Usuário')
+        pwd = self.entryPassword.get('Senha')
         
         usuario = Usuario(
         nome = name,
@@ -294,7 +290,7 @@ class Register(BaseApp):
             numero = number,
             complemento = street2,
             bairro = bairro,
-            idcidade = 1
+            cidade = city
         )
         messagebox.showinfo("Sucesso", resultado)
 
