@@ -83,7 +83,9 @@ class Mascara:
         list_placeholder = [
             'Nome Completo','Data de Nascimento','CPF','CPF*',
             'Telefone','CEP','CEP*','Logradouro','Número','Complemento','Bairro',
-            'Cidade','UF','Nome de Usuário','E-mail','Senha','Repetir Senha'
+            'Cidade','UF','Nome de Usuário','E-mail','Senha','Repetir Senha',
+            'Nome do Documento', 'Data Criação Inicial', 'Data Criação Final',
+            'Nome da Pessoa no Documento', 'CPF da Pessoa no Documento'
             ]
         text = self.entrada.get()
         if text == texto and text in list_placeholder:

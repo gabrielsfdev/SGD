@@ -12,20 +12,21 @@ class BaseTab(BaseApp):
         canvas = Canvas(
             tab,
             bg="#FFFFFF",
-            height=768,
+            height=150,  # Reduced height to accommodate other widgets
             width=1024,
             bd=0,
             highlightthickness=0,
             relief="ridge"
         )
-        canvas.pack(fill="both", expand=True)
+        canvas.pack(fill="both", expand=False)
         canvas.create_rectangle(
             0.0,
-            90.0,
+            0.0,
             1024.0,
-            560.0,
+            150.0,
             fill="#006DFF",
-            outline="")
+            outline=""
+        )
         
         canvas.create_text(
             20.0,
@@ -36,21 +37,6 @@ class BaseTab(BaseApp):
             font=("AbhayaLibre Regular", 40 * -1)
         )
         
-        self.image_lupa = PhotoImage(
-            file=self.relative_to_assets("lupa.png"))
-        self.lupa = Button(
-            image=self.image_lupa,
-            borderwidth=0,
-            highlightthickness=0,
-            command=lambda: print("lupa clicked"),
-            relief="flat"
-        )
-        self.lupa.place(
-            x=645.0,
-            y=384.0,
-            width=56.52173614501953,
-            height=50.0
-        )
         self.image_voltar = PhotoImage(
             file=self.relative_to_assets("voltar.png"))
         voltar = Button(
@@ -67,9 +53,9 @@ class BaseTab(BaseApp):
             height=50.0
         )
         # Adiciona a imagem na aba
-        self.add_image_toy_tab(canvas)
-        self.add_image_rec_tab(canvas)
-        self.add_entry_in_tab(tab, tab_name)
+        #self.add_image_toy_tab(canvas)
+        #self.add_image_rec_tab(canvas)
+        #self.add_entry_in_tab(tab, tab_name)
     def load_image(self):
         # Carrega a imagem apenas uma vez
         image_toy2 = self.relative_to_assets("toy2.png")
@@ -83,11 +69,11 @@ class BaseTab(BaseApp):
             image=self.image_toy2)
     def add_image_rec_tab(self, canvas):
         canvas.create_image(
-        493.0,
-        368.0,
+        100.0,
+        100.0,
         image=self.image_rectangle5
         )
     def add_entry_in_tab(self, tab, tab_name):
         # Cria uma caixa de entrada (entry) na mesma posição onde a imagem foi desenhada
-        entry = Mascara(tab, formato='nome', x=320.0, y=355.0, texto=tab_name)
+        entry = Mascara(tab, formato='nome', x=100, y=100, texto=tab_name)
         return entry

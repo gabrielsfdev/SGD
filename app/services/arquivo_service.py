@@ -1,8 +1,10 @@
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy import or_
 from app.models import ArquivoBD, ArquivoBlobBD
 from app.database import SessionLocal
 from app.services import Sessao
 import os
+from datetime import datetime
 
 class Arquivo:
     def __init__(self):
@@ -46,20 +48,42 @@ class Arquivo:
             self.db_session.rollback()
             return f"Erro ao fazer upload do arquivo: {e}"
     
-    def busca_arquivo(self, param_busca, texto):
+    def busca_arquivo(self, **kwargs):
         session = SessionLocal()
-        try:
-            if hasattr(ArquivoBD, param_busca):
-                filtro = getattr(ArquivoBD, param_busca)
-                busca = session.query(ArquivoBD).filter(filtro.contains(texto)).all()
-                if busca:
-                    return {'success': True, 'message': 'Arquivos encontrados.', 'arquivos': busca}
-                else:
-                    return {'success': False, 'message': 'Nenhum arquivo encontrado.'}
-            else:
-                return {'success': False, 'message': 'Coluna de busca inválida.'}
-        finally:
-            session.close()
+        itens_busca = ['nome_arquivo', 'data_inicial', 'data_final', 'nome_documento', 'cpf_documento']
+        filtro = []
+        
+        for item in itens_busca:
+            valor = kwargs.get(item)
+            if valor:
+                if item == 'nome_arquivo':
+                    filtro.append(ArquivoBD.nome_arquivo.contains(valor))
+                elif item == 'data_inicial':
+                    try:
+                        data_formatada = datetime.strptime(valor, '%d/%m/%Y').date()
+                        filtro.append(ArquivoBD.datacriacao >= data_formatada)
+                    except ValueError:
+                        return {'success': False, 'message': 'Formato de data inválido para data inicial.'}
+                elif item == 'data_final':
+                    try:
+                        data_formatada = datetime.strptime(valor, '%d/%m/%Y').date()
+                        filtro.append(ArquivoBD.datacriacao <= data_formatada)
+                    except ValueError:
+                        return {'success': False, 'message': 'Formato de data inválido para data final.'}
+                elif item == 'nome_documento':
+                    filtro.append(ArquivoBD.nome_documento.contains(valor))
+                elif item == 'cpf_documento':
+                    filtro.append(ArquivoBD.cpf_documento.contains(valor))
+        
+        if not filtro:
+            return {'success': False, 'message': 'Nenhum critério de busca fornecido.'}
+        
+        busca = session.query(ArquivoBD).filter(or_(*filtro)).all()
+        session.close()
+        if busca:
+            return {'success': True, 'message': 'Arquivos encontrados.', 'arquivos': busca}
+        else:
+            return {'success': False, 'message': 'Nenhum arquivo encontrado.'}
     
     def download_arquivo(self, id, nome):
         session = SessionLocal()
