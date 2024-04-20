@@ -23,3 +23,4 @@ class ArquivoBD(Base):
     arquivosetor = relationship('ArquivoSetorBD', back_populates='arquivo')
     arquivousuario = relationship('ArquivoUsuarioBD', back_populates='arquivo')
     dadosarquivo = relationship('DadosArquivoBD', back_populates='arquivo')
+    dadosdocumento = relationship('DadosDocumentoBD', back_populates='arquivo')

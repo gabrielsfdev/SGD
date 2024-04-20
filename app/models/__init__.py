@@ -8,6 +8,7 @@ from .arquivousuario import ArquivoUsuarioBD
 from .base import Base
 from .cidade import CidadeBD
 from .dadosarquivo import DadosArquivoBD
+from .dadosdocumento import DadosDocumentoBD
 from .email import EmailBD
 from .endereco import EnderecoBD
 from .escritorio import EscritorioBD
@@ -28,6 +29,7 @@ __all__ = [
         'Base',
         'CidadeBD',
         'DadosArquivoBD',
+        'DadosDocumentoBD',
         'EmailBD',
         'EnderecoBD',
         'EscritorioBD',
