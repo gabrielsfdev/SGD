@@ -1,10 +1,12 @@
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy import or_
+from sqlalchemy import or_, func
 from app.models import ArquivoBD, ArquivoBlobBD
 from app.database import SessionLocal
 from app.services import Sessao
 import os
 from datetime import datetime
+from tkinter.filedialog import asksaveasfilename
+
 
 class Arquivo:
     def __init__(self):
@@ -57,7 +59,7 @@ class Arquivo:
             valor = kwargs.get(item)
             if valor:
                 if item == 'nome_arquivo':
-                    filtro.append(ArquivoBD.nome_arquivo.contains(valor))
+                    filtro.append(func.lower(ArquivoBD.nome_arquivo).contains(valor.lower()))
                 elif item == 'data_inicial':
                     try:
                         data_formatada = datetime.strptime(valor, '%d/%m/%Y').date()
@@ -71,14 +73,20 @@ class Arquivo:
                     except ValueError:
                         return {'success': False, 'message': 'Formato de data inválido para data final.'}
                 elif item == 'nome_documento':
-                    filtro.append(ArquivoBD.nome_documento.contains(valor))
+                    filtro.append(func.lower(ArquivoBD.nome_documento).contains(valor.lower()))
                 elif item == 'cpf_documento':
                     filtro.append(ArquivoBD.cpf_documento.contains(valor))
         
         if not filtro:
             return {'success': False, 'message': 'Nenhum critério de busca fornecido.'}
         
-        busca = session.query(ArquivoBD).filter(or_(*filtro)).all()
+        busca = (session.query(
+                        ArquivoBD.id,
+                        ArquivoBD.nome_arquivo,
+                        ArquivoBD.datacriacao
+                        )
+                        .filter(or_(*filtro))
+                        .all())
         session.close()
         if busca:
             return {'success': True, 'message': 'Arquivos encontrados.', 'arquivos': busca}
@@ -90,19 +98,16 @@ class Arquivo:
         try:
             busca = session.query(ArquivoBlobBD).filter(ArquivoBlobBD.idarquivo == id).first()
             if busca:
-                print("Por favor, informe o caminho completo onde deseja salvar o arquivo:")
-                caminho = input("Caminho: ")
+                # Abre a janela de diálogo para salvar arquivo
+                caminho = asksaveasfilename(defaultextension=".pdf",
+                                            filetypes=[("PDF files", "*.pdf"), ("All files", "*.*")],
+                                            initialfile=nome)
                 if not caminho:
-                    return {'success': False, 'message': 'Caminho não fornecido. Download cancelado.'}
+                    return {'success': False, 'message': 'Download cancelado pelo usuário.'}
                 
-                if caminho[-1] != '\\':
-                    caminho += '\\'
-
-                caminho += nome
-
                 with open(caminho, 'wb') as f:
                     f.write(busca.blob_dados)
-
+                
                 return {'success': True, 'message': 'Arquivo salvo com sucesso!', 'caminho': caminho}
             else:
                 return {'success': False, 'message': 'Nenhum arquivo encontrado.'}
