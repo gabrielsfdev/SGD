@@ -12,7 +12,7 @@ class Consulta(BaseTab):
         super().__init__(controller)
         self.create_canvas()
         self.create_notebook()
-        self.load_image()  # Carrega a imagem apenas uma vez
+        self.load_image()
 
     def create_notebook(self):
         self.notebook_style = ttk.Style()
@@ -31,7 +31,7 @@ class Consulta(BaseTab):
             }
         })
         self.notebook_style.theme_use("CustomStyle")
-        self.notebook = ttk.Notebook(self.canvas)  # Adicionando o notebook como filho do canvas
+        self.notebook = ttk.Notebook(self.canvas)
         self.notebook.pack(expand=True, fill="both")
         self.create_tabs()
 
@@ -54,41 +54,59 @@ class Consulta(BaseTab):
 
         image_lupa = PhotoImage(file=self.relative_to_assets("lupa.png"))
         lupa_button = Button(tab, image=image_lupa, borderwidth=0, highlightthickness=0, command=lambda: self.populate_treeview(tab), relief="flat")
-        lupa_button.image = image_lupa  # Keep a reference!
+        lupa_button.image = image_lupa
         lupa_button.place(x=750, y=y_offset, width=46, height=40)
 
-        y_offset = 0  # Increment for treeview placement
-        #self.populate_treeview(tab, 0)
+        y_offset = 0
 
     def populate_treeview(self, tab, y_offset=0):
         if hasattr(self, 'tree'):
             self.tree.destroy()
-            
+
         tree_style = ttk.Style()
         tree_style.configure("Treeview.Heading", background="#0078D7", foreground="white", font=('Abel Regular', 12))
         tree_style.map("Treeview.Heading", background=[('active', '#0066CC')])
         tree_style.configure("Treeview", background="white", foreground="black", rowheight=25, fieldbackground="white")
         tree_style.map("Treeview", background=[('selected', '#0078D7')])
-        
+
         tree = ttk.Treeview(tab, columns=('ID', 'Nome', 'Data Criação', 'Download'), show='headings')
         for col in ('ID', 'Nome', 'Data Criação'):
             tree.heading(col, text=col)
             tree.column(col, width=100, anchor=tk.CENTER)
-            
+
         tree.heading('Download', text='Download')
         tree.column('Download', width=100, anchor='center')
 
         data = self.campos_preenchidos()
         for item in data:
-            iid = tree.insert('', 'end', values=(item.id, item.nome_arquivo, item.datacriacao.strftime('%d/%m/%Y'), ''))
-            tree.tag_bind(iid, '<1>', lambda event, id=iid: self.on_download_click(event, id))  # Bind click event
-
+            iid = tree.insert('', 'end', values=(item.id, item.nome_arquivo, item.datacriacao, 'Baixar Arquivo ▼'))
 
         tree.pack(expand=True, fill='both', pady=(y_offset, 0))
+
+        def on_download_click(event):
+            try:
+                region = self.tree.identify_region(event.x, event.y)
+                column = self.tree.identify_column(event.x)
+                if region == "cell" and column == "#4":
+                    iid = self.tree.identify_row(event.y)
+                    item = self.tree.item(iid)
+                    item_id = item['values'][0]
+                    item_nome = item['values'][1]
+                    
+                    arquivo = Arquivo()
+                    download = arquivo.download_arquivo(item_id, item_nome)
+                    
+                    if download['success']:
+                        messagebox.showinfo("Download Concluído", download['message'])
+                    else:
+                        messagebox.showerror("Erro no Download", download['message'])
+            except Exception as e:
+                messagebox.showerror("Erro no Download", f"Ocorreu um erro durante o download: {e}")
+
+        tree.bind('<Button-1>', on_download_click)
         self.tree = tree
         
     def campos_preenchidos(self):
-    # Gather all field values that are not empty
         valores_preenchidos = {
             'nome_arquivo': self.nome_arquivo.get('Nome do Documento'),
             'data_inicial': self.data_inicial.get('Data Criação Inicial'),
@@ -100,24 +118,14 @@ class Consulta(BaseTab):
         dados_filtrados = {chave: valor for chave, valor in valores_preenchidos.items() if valor.strip()}
         if len(dados_filtrados) > 0:
             arquivo = Arquivo()
-            busca = arquivo.busca_arquivo(**dados_filtrados)
-            return busca['arquivos']
-        else:
-            messagebox.showerror('Erro na Busca', 'Você precisa preencher ao menos um campo.')
-        
-
-        
-
-    def buscar_arquivos(self):
-        nome_arquivo = self.nome_arquivo.get('Nome do Documento')
-        search_data = {chave: valor.get() for chave, valor in self.campos_busca.items() if valor.get().strip()}
-        arquivo = Arquivo()
-        busca = arquivo.busca_arquivo(self.campos_busca)
-        return [
-            {'ID': 1, 'Nome': 'Documento1.pdf', 'CPF': '000.000.000-00'},
-            {'ID': 2, 'Nome': 'Relatorio1.pdf', 'CPF': '111.111.111-11'},
-            {'ID': 3, 'Nome': 'Relatorio3.pdf', 'CPF': '111.111.111-11'}
-        ]
+            try:
+                busca = arquivo.busca_arquivo(**dados_filtrados)
+                if busca['success']:
+                    return busca['arquivos']
+                else:
+                    messagebox.showerror('Erro na Busca', busca['message'])
+            except:
+                messagebox.showerror('Erro na Busca', 'Você precisa preencher ao menos um campo.')
 
     def open_principal(self):
         self.destroy()
