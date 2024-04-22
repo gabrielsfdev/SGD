@@ -8,12 +8,14 @@ class OCR_DOCS:
     def __init__(self, img_path) -> None:
         self.path = img_path
         self.img = format_identificator(img_path)
-        self.extracted = ""
-        self.name = ""
-        self.rg_id = ""
-        self.born_date = ""
-        self.mother_name = ""
-        self.place_of_birth = ""
+        self.extracted = None
+        self.name = None
+        self.rg_id = None
+        self.born_date = None
+        self.mother_name = None
+        self.place_of_birth = None
+        self.attempt = 0
+        self.thresh = 150
 
     def new_rg(self):
         filter = cv2.imread(f"{self.path[:-7]}_gt_segmentation.jpg")
@@ -22,27 +24,27 @@ class OCR_DOCS:
         imagem_cinza = cv2.cvtColor(rgb, cv2.COLOR_BGR2GRAY)
         filtro_cinza = cv2.cvtColor(filter, cv2.COLOR_BGR2GRAY)
         img_aux = imagem_cinza.copy()
-        img_aux[filtro_cinza < 50] = 255
-        thre = cv2.threshold(img_aux, 165, 255, cv2.THRESH_BINARY)[1]
+        img_aux[filtro_cinza < 60] = 255
+        thre = cv2.threshold(img_aux, self.thresh, 255, cv2.THRESH_BINARY)[1]
 
      
-        cv2.imshow("apos_mudancas", thre)
+        # cv2.imshow("apos_mudancas", thre)
         # cv2.imshow("sem rgb", image2)
-        cv2.waitKey(0)
+        # cv2.waitKey(0)
 
-        print("shape1", rgb.shape)
+        # print("shape1", rgb.shape)
         # cv2.imshow("Imagem Cinza", imagem_cinza)
         # cv2.waitKey(0)
 
         angulacao = self.identificar_angulacao(self.img)
-        print("angulacao", angulacao)
+        # print("angulacao", angulacao)
         osd = pytesseract.image_to_osd(rgb, output_type=pytesseract.Output.DICT)
-        print("osd", osd)
+        # print("osd", osd)
         if osd['rotate'] == 90 or osd['rotate'] == 180 or osd['rotate'] == 270:
             angulacao = -osd["rotate"]
         elif angulacao > 45:
             angulacao = angulacao - 90
-            print('nova', angulacao)
+            # print('nova', angulacao)
 
         altura = largura = max(self.img.shape[:2])
         centro = (largura // 2, altura // 2)
@@ -53,12 +55,13 @@ class OCR_DOCS:
             (largura, altura),
             borderMode=cv2.BORDER_CONSTANT,
         )
-        cv2.imshow("Imagem Rotacionada", img_aux)
-        cv2.waitKey(0)
+        # cv2.imshow("Imagem Rotacionada", img_aux)
+        # cv2.waitKey(0)
 
         self.extracted = pytesseract.image_to_string(
             img_aux, lang="por", config="--psm 6"
         )
+        # self.attempt += 1
 
     def identificar_angulacao(self, img):
         imagem_cinza = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -74,8 +77,9 @@ class OCR_DOCS:
     def find_name(self):
         regex = r"nome\s*([^\n]+)"
         name = re.findall(regex, self.extracted.lower(), re.DOTALL)
-        print("nome do regex", name)
+        # print("nome do regex", name)
         if name:
+            # print("Achou nome")
             return name[0].upper()
 
     def find_rg(self):
@@ -111,15 +115,17 @@ class OCR_DOCS:
             return place_of_birth[0].upper()
 
     def extract_info(self):
-        if self.name == "":
+        if self.attempt == 0:
+            print("Carregando..")
+        if self.name is None:
             self.name = self.find_name()
-        if self.rg_id == "":
+        if self.rg_id is None:
             self.rg_id = self.find_rg()
-        if self.born_date == "":
+        if self.born_date is None:
             self.born_date = self.find_born_date()
-        if self.mother_name == "":  # Este não pode ser obrigatório
+        if self.mother_name is None:  # Este não pode ser obrigatório
             self.mother_name = self.find_mother_name()
-        if self.place_of_birth == "":
+        if self.place_of_birth is None:
             self.place_of_birth = self.find_place_of_birth()
 
         if not all(
@@ -130,15 +136,26 @@ class OCR_DOCS:
                 self.mother_name,
                 self.place_of_birth,
             ]
-        ):
-            return "Fazer modificações na imagem e tentar novamente"
+        ) and self.attempt < 20:
+            print(f"{self.attempt * 5}%")
+            self.attempt += 1
+            self.thresh += 5
+            self.new_rg()
+            self.extract_info()
+        else:
+            print("100%")
+        
+        return {
+            "name": self.name,
+            "rg_id": self.rg_id,
+            "born_date": self.born_date,
+            "mother_name": self.mother_name,
+            "place_of_birth": self.place_of_birth,
+        }
+        
 
 
 if __name__ == "__main__":
-    ocr = OCR_DOCS("ambiente_virtual/00025929_in.jpg")
+    ocr = OCR_DOCS("ambiente_virtual/00025937_in.jpg")
     ocr.new_rg()
-    ocr.extract_info()
-    print(ocr.extracted)
-
-    
-    
+    print(ocr.extract_info())
