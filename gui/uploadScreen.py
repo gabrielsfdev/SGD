@@ -90,7 +90,9 @@ class Upload(BaseApp):
     def janela_selecao(self):
         caminho_arquivo = filedialog.askopenfilename(
             title="Selecionar Arquivo",
-            filetypes=(("Arquivos PDF", "*.pdf"), ("Arquivos de Imagem", ['*.jpg','*.jpeg','*.png']))  # Tipos de arquivo
+            filetypes=(
+                        ("Arquivos JPEG", "*.jpeg;*.jpg"),
+                        ("Arquivos PNG", "*.png"))  # Tipos de arquivo
         )
         if caminho_arquivo:
             self.caminho_arquivo = caminho_arquivo

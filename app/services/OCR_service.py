@@ -1,11 +1,12 @@
 import cv2
 import pytesseract
 import re
-from convert_format import format_identificator
+import os
 
 # Pensar se é necessário transformar a classe em estática em sprint futura
 class OCR_DOCS:
     def __init__(self, img_path) -> None:
+        from .convert_format import format_identificator
         self.path = img_path
         self.img = format_identificator(img_path)
         self.extracted = None
@@ -18,7 +19,8 @@ class OCR_DOCS:
         self.thresh = 150
 
     def new_rg(self):
-        filter = cv2.imread(f"{self.path[:-7]}_gt_segmentation.jpg")
+        file_path = f'app\\data\\masks\\{os.path.basename(self.path)}'
+        filter = cv2.imread(f"{file_path[:-7]}_gt_segmentation.jpg")
 
         rgb = cv2.cvtColor(self.img, cv2.COLOR_RGB2BGR)
         imagem_cinza = cv2.cvtColor(rgb, cv2.COLOR_BGR2GRAY)
@@ -27,7 +29,6 @@ class OCR_DOCS:
         img_aux[filtro_cinza < 60] = 255
         thre = cv2.threshold(img_aux, self.thresh, 255, cv2.THRESH_BINARY)[1]
 
-     
         # cv2.imshow("apos_mudancas", thre)
         # cv2.imshow("sem rgb", image2)
         # cv2.waitKey(0)
@@ -143,16 +144,28 @@ class OCR_DOCS:
             self.new_rg()
             self.extract_info()
         else:
-            print("100%")
+            print("100%")        
         
-        return {
-            "name": self.name,
-            "rg_id": self.rg_id,
-            "born_date": self.born_date,
-            "mother_name": self.mother_name,
-            "place_of_birth": self.place_of_birth,
+        if not any(
+            [
+                self.name,
+                self.rg_id,
+                self.born_date,
+                self.mother_name,
+                self.place_of_birth,
+            ]
+        ):
+            return {'success': False, 'message': 'Fazer modificações na imagem e tentar novamente'}
+        
+        dados_documento = {
+            'nome_documento': self.name if self.name else '',
+            'numero_rg': self.rg_id if self.rg_id else '',
+            'data_nascimento': self.born_date if self.born_date else '',
+            'nome_mae': self.mother_name if self.mother_name else '',
+            'local_nascimento': self.place_of_birth if self.place_of_birth else ''
         }
         
+        return {'success': True, 'message': 'Dados extraídos com sucesso', 'dados': dados_documento}
 
 
 if __name__ == "__main__":
