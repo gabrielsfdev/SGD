@@ -1,10 +1,10 @@
-from sqlalchemy.exc import IntegrityError
-from sqlalchemy import or_, func
-from app.models import ArquivoBD, ArquivoBlobBD
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from sqlalchemy import or_, and_, func
+from app.models import ArquivoBD, ArquivoBlobBD, DadosDocumentoBD
 from app.database import SessionLocal
 from app.services import Sessao
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 from tkinter.filedialog import asksaveasfilename
 
 
@@ -29,6 +29,12 @@ class Arquivo:
             if not id_usuario:
                 raise Exception("Usuário não está logado.")
             
+            from app.services import OCR_DOCS
+            
+            ocr = OCR_DOCS(caminho_arquivo)
+            img = ocr.new_rg()
+            dados = ocr.extract_info()
+            
             with open(caminho_arquivo, 'rb') as arquivo:
                 dados_arquivo = arquivo.read()
                 tamanho = os.path.getsize(caminho_arquivo)
@@ -41,6 +47,19 @@ class Arquivo:
 
                 blob_arquivo = ArquivoBlobBD(idarquivo=novo_arquivo.id, blob_dados=dados_arquivo)
                 self.db_session.add(blob_arquivo)
+                
+                if dados['success']:
+                
+                    dados_documento = DadosDocumentoBD(
+                        idarquivo=novo_arquivo.id,
+                        nome_documento=dados['dados']['nome_documento'],
+                        numero_rg=dados['dados']['numero_rg'],
+                        data_nascimento=dados['dados']['data_nascimento'],
+                        nome_mae=dados['dados']['nome_mae'],
+                        local_nascimento=dados['dados']['local_nascimento'],
+                    )
+
+                    self.db_session.add(dados_documento)
 
                 self.db_session.commit()
                 
@@ -52,46 +71,63 @@ class Arquivo:
     
     def busca_arquivo(self, **kwargs):
         session = SessionLocal()
-        itens_busca = ['nome_arquivo', 'data_inicial', 'data_final', 'nome_documento', 'cpf_documento']
-        filtro = []
-        
-        for item in itens_busca:
-            valor = kwargs.get(item)
-            if valor:
-                if item == 'nome_arquivo':
-                    filtro.append(func.lower(ArquivoBD.nome_arquivo).contains(valor.lower()))
-                elif item == 'data_inicial':
-                    try:
-                        data_formatada = datetime.strptime(valor, '%d/%m/%Y').date()
-                        filtro.append(ArquivoBD.datacriacao >= data_formatada)
-                    except ValueError:
-                        return {'success': False, 'message': 'Formato de data inválido para data inicial.'}
-                elif item == 'data_final':
-                    try:
-                        data_formatada = datetime.strptime(valor, '%d/%m/%Y').date()
-                        filtro.append(ArquivoBD.datacriacao <= data_formatada)
-                    except ValueError:
-                        return {'success': False, 'message': 'Formato de data inválido para data final.'}
-                elif item == 'nome_documento':
-                    filtro.append(func.lower(ArquivoBD.nome_documento).contains(valor.lower()))
-                elif item == 'cpf_documento':
-                    filtro.append(ArquivoBD.cpf_documento.contains(valor))
-        
-        if not filtro:
-            return {'success': False, 'message': 'Nenhum critério de busca fornecido.'}
-        
-        busca = (session.query(
-                        ArquivoBD.id,
-                        ArquivoBD.nome_arquivo,
-                        ArquivoBD.datacriacao
-                        )
-                        .filter(or_(*filtro))
-                        .all())
-        session.close()
-        if busca:
-            return {'success': True, 'message': 'Arquivos encontrados.', 'arquivos': busca}
-        else:
-            return {'success': False, 'message': 'Nenhum arquivo encontrado.'}
+        try:
+            filtro_arquivo = []
+            filtro_documento = []
+
+            for chave, valor in kwargs.items():
+                if valor:
+                    valor = valor.strip()
+                    if chave == 'nome_arquivo':
+                        filtro_arquivo.append(func.lower(ArquivoBD.nome_arquivo).contains(valor.lower()))
+                    elif chave in ['data_inicial', 'data_final']:
+                        try:
+                            data_formatada = datetime.strptime(valor, '%d/%m/%Y').date()
+                            if chave == 'data_inicial':
+                                filtro_arquivo.append(ArquivoBD.datacriacao >= data_formatada) 
+                            else:
+                                data_formatada = datetime.strptime(valor, '%d/%m/%Y') + timedelta(days=1, microseconds=-1)
+                                filtro_arquivo.append(ArquivoBD.datacriacao <= data_formatada)
+                        except ValueError:
+                            return {'success': False, 'message': f'Formato de data inválido para {chave}.'}
+                    elif chave == 'nome_documento':
+                        filtro_documento.append(func.lower(DadosDocumentoBD.nome_documento).contains(valor.lower()))
+                    elif chave == 'numero_rg':
+                        filtro_documento.append(DadosDocumentoBD.numero_rg.contains(valor))
+                    elif chave == 'data_nascimento':
+                        try:
+                            data_formatada = datetime.strptime(valor, '%d/%m/%Y').date()
+                            filtro_documento.append(DadosDocumentoBD.data_nascimento == data_formatada)
+                        except ValueError:
+                            return {'success': False, 'message': f'Formato de data inválido para {chave}.'}
+                    elif chave == 'nome_mae':
+                        filtro_documento.append(func.lower(DadosDocumentoBD.nome_mae).contains(valor.lower()))
+                    elif chave == 'local_nascimento':
+                        filtro_documento.append(func.lower(DadosDocumentoBD.local_nascimento).contains(valor.lower()))
+
+            if not filtro_arquivo and not filtro_documento:
+                return {'success': False, 'message': 'Nenhum critério de busca fornecido.'}
+
+            busca = (session.query(ArquivoBD.id, ArquivoBD.nome_arquivo, DadosDocumentoBD.nome_documento.label('nome_pessoa'), ArquivoBD.datacriacao)
+                            .join(DadosDocumentoBD, ArquivoBD.id == DadosDocumentoBD.idarquivo)
+                            .filter(and_(or_(*filtro_arquivo), or_(*filtro_documento)))
+                            .all())
+
+            if busca:
+                return {'success': True, 'message': 'Arquivos encontrados.', 'arquivos': busca}
+            else:
+                return {'success': False, 'message': 'Nenhum arquivo encontrado.'}
+
+        except SQLAlchemyError as e:
+            session.rollback()
+            return {'success': False, 'message': f'Erro ao acessar banco de dados: {str(e)}'}
+        finally:
+            session.close()
+
+            if busca:
+                return {'success': True, 'message': 'Arquivos encontrados.', 'arquivos': busca}
+            else:
+                return {'success': False, 'message': 'Nenhum arquivo encontrado.'}
     
     def download_arquivo(self, id, nome):
         session = SessionLocal()

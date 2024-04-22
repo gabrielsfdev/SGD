@@ -85,7 +85,8 @@ class Mascara:
             'Telefone','CEP','CEP*','Logradouro','Número','Complemento','Bairro',
             'Cidade','UF','Nome de Usuário','E-mail','Senha','Repetir Senha',
             'Nome do Documento', 'Data Criação Inicial', 'Data Criação Final',
-            'Nome da Pessoa no Documento', 'CPF da Pessoa no Documento'
+            'Nome no Documento', 'Numero do Documento', 'Data de Nascimento',
+            'Nome da Mãe', 'Local de Nascimento'
             ]
         text = self.entrada.get()
         if text == texto and text in list_placeholder:

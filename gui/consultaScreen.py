@@ -44,11 +44,14 @@ class Consulta(BaseTab):
             self.create_search_and_treeview(tab)
 
     def create_search_and_treeview(self, tab):        
-        self.nome_arquivo = Mascara(self, formato='nome', x=100, y=80.0, texto='Nome do Documento')
-        self.data_inicial = Mascara(self, formato="date", tamanho_max=8, x=400, y=80.0, texto='Data Criação Inicial')
-        self.data_final = Mascara(self, formato="date", tamanho_max=8, x=700, y=80.0, texto='Data Criação Final')
-        self.nome_documento = Mascara(self, formato='nome', x=100.0, y=130.0, texto='Nome da Pessoa no Documento')
-        self.cpf_documento = Mascara(self, formato="cpf", tamanho_max=11, x=400, y=130.0, texto='CPF da Pessoa no Documento')
+        self.nome_arquivo = Mascara(self, formato='nome', x=100, y=50.0, texto='Nome do Documento')
+        self.data_inicial = Mascara(self, formato="date", tamanho_max=8, x=400, y=50.0, texto='Data Criação Inicial')
+        self.data_final = Mascara(self, formato="date", tamanho_max=8, x=700, y=50.0, texto='Data Criação Final')
+        self.nome_documento = Mascara(self, formato='nome', x=100.0, y=100.0, texto='Nome no Documento')
+        self.numero_rg = Mascara(self, formato="nome", x=400, y=100.0, texto='Numero do Documento')
+        self.data_nascimento = Mascara(self, formato="date", tamanho_max=8, x=700, y=100.0, texto='Data de Nascimento')
+        self.nome_mae = Mascara(self, formato="nome", x=100, y=150.0, texto='Nome da Mãe')
+        self.local_nascimento = Mascara(self, formato="nome", x=400, y=150.0, texto='Local de Nascimento')
 
         y_offset = 100
 
@@ -69,8 +72,8 @@ class Consulta(BaseTab):
         tree_style.configure("Treeview", background="white", foreground="black", rowheight=25, fieldbackground="white")
         tree_style.map("Treeview", background=[('selected', '#0078D7')])
 
-        tree = ttk.Treeview(tab, columns=('ID', 'Nome', 'Data Criação', 'Download'), show='headings')
-        for col in ('ID', 'Nome', 'Data Criação'):
+        tree = ttk.Treeview(tab, columns=('ID', 'Nome Arquivo', 'Nome Pessoa', 'Data Criação', 'Download'), show='headings')
+        for col in ('ID', 'Nome Arquivo', 'Nome Pessoa', 'Data Criação'):
             tree.heading(col, text=col)
             tree.column(col, width=100, anchor=tk.CENTER)
 
@@ -79,7 +82,7 @@ class Consulta(BaseTab):
 
         data = self.campos_preenchidos()
         for item in data:
-            iid = tree.insert('', 'end', values=(item.id, item.nome_arquivo, item.datacriacao, 'Baixar Arquivo ▼'))
+            iid = tree.insert('', 'end', values=(item.id, item.nome_arquivo, item.nome_pessoa, item.datacriacao.strftime('%d/%m/%Y'), 'Baixar Arquivo ▼'))
 
         tree.pack(expand=True, fill='both', pady=(y_offset, 0))
 
@@ -87,7 +90,7 @@ class Consulta(BaseTab):
             try:
                 region = self.tree.identify_region(event.x, event.y)
                 column = self.tree.identify_column(event.x)
-                if region == "cell" and column == "#4":
+                if region == "cell" and column == "#5":
                     iid = self.tree.identify_row(event.y)
                     item = self.tree.item(iid)
                     item_id = item['values'][0]
@@ -111,21 +114,28 @@ class Consulta(BaseTab):
             'nome_arquivo': self.nome_arquivo.get('Nome do Documento'),
             'data_inicial': self.data_inicial.get('Data Criação Inicial'),
             'data_final': self.data_final.get('Data Criação Final'),
-            'nome_documento': self.nome_documento.get('Nome da Pessoa no Documento'),
-            'cpf_documento': self.cpf_documento.get('CPF da Pessoa no Documento')
+            'nome_documento': self.nome_documento.get('Nome no Documento'),
+            'numero_rg': self.numero_rg.get('Numero do Documento'),
+            'data_nascimento': self.data_nascimento.get('Data de Nascimento'),
+            'nome_mae': self.nome_mae.get('Nome da Mãe'),
+            'local_nascimento': self.local_nascimento.get('Local de Nascimento')
         }
     
         dados_filtrados = {chave: valor for chave, valor in valores_preenchidos.items() if valor.strip()}
-        if len(dados_filtrados) > 0:
-            arquivo = Arquivo()
-            try:
-                busca = arquivo.busca_arquivo(**dados_filtrados)
-                if busca['success']:
-                    return busca['arquivos']
-                else:
-                    messagebox.showerror('Erro na Busca', busca['message'])
-            except:
-                messagebox.showerror('Erro na Busca', 'Você precisa preencher ao menos um campo.')
+        if not dados_filtrados:
+            messagebox.showinfo('Aviso', 'Você precisa preencher ao menos um campo para a busca.')
+            return
+
+        arquivo = Arquivo()
+        try:
+            busca = arquivo.busca_arquivo(**dados_filtrados)
+            if busca['success']:
+                return busca['arquivos']
+            else:
+                messagebox.showerror('Erro na Busca', busca['message'])
+        except Exception as e:
+            # Aqui você pode logar o erro se estiver usando um sistema de logs
+            messagebox.showerror('Erro na Busca', f'Um erro inesperado ocorreu: {str(e)}')
 
     def open_principal(self):
         self.destroy()
