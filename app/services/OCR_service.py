@@ -36,24 +36,28 @@ class OCR_DOCS:
 
         angulacao = self.identificar_angulacao(self.img)
         print("angulacao", angulacao)
-        if angulacao > 45:
+        osd = pytesseract.image_to_osd(rgb, output_type=pytesseract.Output.DICT)
+        print("osd", osd)
+        if osd['rotate'] == 90 or osd['rotate'] == 180 or osd['rotate'] == 270:
+            angulacao = -osd["rotate"]
+        elif angulacao > 45:
             angulacao = angulacao - 90
             print('nova', angulacao)
 
         altura = largura = max(self.img.shape[:2])
         centro = (largura // 2, altura // 2)
-        matriz_rotacao = cv2.getRotationMatrix2D(centro, -angulacao, 1.0)
-        imagem_rotacionada = cv2.warpAffine(
+        matriz_rotacao = cv2.getRotationMatrix2D(centro, angulacao, 1.0)
+        img_aux = cv2.warpAffine(
             thre,
             matriz_rotacao,
             (largura, altura),
             borderMode=cv2.BORDER_CONSTANT,
         )
-        cv2.imshow("Imagem Rotacionada", imagem_rotacionada)
+        cv2.imshow("Imagem Rotacionada", img_aux)
         cv2.waitKey(0)
 
         self.extracted = pytesseract.image_to_string(
-            imagem_rotacionada, lang="por", config="--psm 6"
+            img_aux, lang="por", config="--psm 6"
         )
 
     def identificar_angulacao(self, img):
@@ -131,7 +135,7 @@ class OCR_DOCS:
 
 
 if __name__ == "__main__":
-    ocr = OCR_DOCS("ambiente_virtual/00025928_in.jpg")
+    ocr = OCR_DOCS("ambiente_virtual/00025929_in.jpg")
     ocr.new_rg()
     ocr.extract_info()
     print(ocr.extracted)
