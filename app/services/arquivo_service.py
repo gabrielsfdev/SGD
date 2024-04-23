@@ -1,6 +1,6 @@
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy import or_, and_, func
-from app.models import ArquivoBD, ArquivoBlobBD, DadosDocumentoBD
+from app.models import ArquivoBD, ArquivoBlobBD, DadosDocumentoBD, DadosArquivoBD
 from app.database import SessionLocal
 from app.services import Sessao
 import os
@@ -21,8 +21,16 @@ class Arquivo:
         except Exception as e:
             print(f"Necessário estar logado para fazer um upload: {e}")
             return None
-
+        
     def upload_arquivo(self, caminho_arquivo):
+        nome = os.path.basename(caminho_arquivo)
+        if nome.split('.')[-1] == 'pdf':
+            return self.upload_contrato(caminho_arquivo)
+        else:
+            return self.upload_documento(caminho_arquivo)
+        
+
+    def upload_documento(self, caminho_arquivo):
         # Lê o arquivo e cria os registros no banco
         try:
             id_usuario = self.usuario()
@@ -69,7 +77,46 @@ class Arquivo:
             self.db_session.rollback()
             return f"Erro ao fazer upload do arquivo: {e}"
     
-    def busca_arquivo(self, **kwargs):
+    def upload_contrato(self, caminho_arquivo):
+        # Lê o arquivo e cria os registros no banco
+        try:
+            id_usuario = self.usuario()
+            if not id_usuario:
+                raise Exception("Usuário não está logado.")
+            
+            with open(caminho_arquivo, 'rb') as arquivo:
+                dados_arquivo = arquivo.read()
+                tamanho = os.path.getsize(caminho_arquivo)
+                nome = os.path.basename(caminho_arquivo)
+                tipo = nome.split('.')[-1]
+
+                novo_arquivo = ArquivoBD(nome_arquivo=nome, idusuario=id_usuario, tipo_arquivo=tipo, tamanho_arquivo=tamanho)
+                self.db_session.add(novo_arquivo)
+                self.db_session.flush()
+
+                blob_arquivo = ArquivoBlobBD(idarquivo=novo_arquivo.id, blob_dados=dados_arquivo)
+                self.db_session.add(blob_arquivo)
+                
+                with open('app\\data\\conteudo_exemplo.txt', 'r', encoding='utf-8') as arquivo:
+                    conteudo = arquivo.read()
+                
+                dados_contrato = DadosArquivoBD(
+                    idarquivo=novo_arquivo.id,
+                    resumo_arquivo='Esse é um resumo de teste para inserir no arquivo.',
+                    conteudo_arquivo=conteudo
+                )
+
+                self.db_session.add(dados_contrato)
+
+                self.db_session.commit()
+                
+                return {'success': True, 'message': 'Arquivo salvo com sucesso!', 'nome': nome}
+
+        except Exception as e:
+            self.db_session.rollback()
+            return f"Erro ao fazer upload do arquivo: {e}"
+    
+    def busca_documento(self, **kwargs):
         session = SessionLocal()
         try:
             filtro_arquivo = []
@@ -112,6 +159,75 @@ class Arquivo:
                             .join(DadosDocumentoBD, ArquivoBD.id == DadosDocumentoBD.idarquivo)
                             .filter(and_(or_(*filtro_arquivo), or_(*filtro_documento)))
                             .all())
+
+            if busca:
+                return {'success': True, 'message': 'Arquivos encontrados.', 'arquivos': busca}
+            else:
+                return {'success': False, 'message': 'Nenhum arquivo encontrado.'}
+
+        except SQLAlchemyError as e:
+            session.rollback()
+            return {'success': False, 'message': f'Erro ao acessar banco de dados: {str(e)}'}
+        finally:
+            session.close()
+
+            if busca:
+                return {'success': True, 'message': 'Arquivos encontrados.', 'arquivos': busca}
+            else:
+                return {'success': False, 'message': 'Nenhum arquivo encontrado.'}
+
+
+    def busca_contrato(self, **kwargs):
+        session = SessionLocal()
+        try:
+            filtro_arquivo = []
+            filtro_contrato = []
+            stop_words = set(['de', 'para', 'a', 'o', 'as', 'os', 'e', 'do', 'da', 'dos', 'das', 'um', 'uma'])
+
+            for chave, valor in kwargs.items():
+                if valor:
+                    valor = valor.strip()
+                    if chave == 'nome_arquivo':
+                        filtro_arquivo.append(func.lower(ArquivoBD.nome_arquivo).contains(valor.lower()))
+                    elif chave in ['data_inicial', 'data_final']:
+                        try:
+                            data_formatada = datetime.strptime(valor, '%d/%m/%Y').date()
+                            if chave == 'data_inicial':
+                                filtro_arquivo.append(ArquivoBD.datacriacao >= data_formatada) 
+                            else:
+                                data_formatada = datetime.strptime(valor, '%d/%m/%Y') + timedelta(days=1, microseconds=-1)
+                                filtro_arquivo.append(ArquivoBD.datacriacao <= data_formatada)
+                        except ValueError:
+                            return {'success': False, 'message': f'Formato de data inválido para {chave}.'}
+                    elif chave == 'conteudo_arquivo':
+                        filtro_contrato.append(func.lower(DadosArquivoBD.conteudo_arquivo).contains(valor.lower()))
+                        palavras = valor.split()
+                        palavras_chave = [palavra for palavra in palavras if palavra.lower() not in stop_words]
+                        if len(palavras_chave) > 1:
+                            for palavra in palavras_chave:
+                                filtro_contrato.append(func.lower(DadosArquivoBD.conteudo_arquivo).contains(palavra.lower()))
+
+            if not filtro_arquivo and not filtro_contrato:
+                return {'success': False, 'message': 'Nenhum critério de busca fornecido.'}
+            
+            if filtro_arquivo and filtro_contrato:
+                # Ambos os filtros contêm condições
+                condicao_final = and_(and_(*filtro_arquivo), or_(*filtro_contrato))
+            elif filtro_arquivo:
+                # Apenas filtro_arquivo contém condições
+                condicao_final = and_(*filtro_arquivo)
+            elif filtro_contrato:
+                # Apenas filtro_contrato contém condições
+                condicao_final = or_(*filtro_contrato)
+
+            busca = (session.query(
+                    ArquivoBD.id,
+                    ArquivoBD.nome_arquivo,
+                    DadosArquivoBD.resumo_arquivo.label('resumo_contrato'),
+                    ArquivoBD.datacriacao)
+                    .join(DadosArquivoBD, ArquivoBD.id == DadosArquivoBD.idarquivo)
+                    .filter(condicao_final)
+                    .all())
 
             if busca:
                 return {'success': True, 'message': 'Arquivos encontrados.', 'arquivos': busca}
