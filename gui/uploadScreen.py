@@ -91,6 +91,8 @@ class Upload(BaseApp):
         caminho_arquivo = filedialog.askopenfilename(
             title="Selecionar Arquivo",
             filetypes=(
+                        ('Todos os Arquivos', '*.*'),
+                        ('Arquivos PDF', '*.pdf'),
                         ("Arquivos JPEG", "*.jpeg;*.jpg"),
                         ("Arquivos PNG", "*.png"))  # Tipos de arquivo
         )

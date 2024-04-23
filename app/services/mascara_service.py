@@ -1,12 +1,13 @@
 import tkinter as tk
 
 class Mascara:
-    def __init__(self, master, formato, tamanho_max=None, **kwargs):
+    def __init__(self, master, formato, tamanho_max=None, tab=None, **kwargs):
         self.formato = formato
         self.tamanho_max = tamanho_max
-        self.criar_entrada(master, **kwargs)
+        self.tab = tab if tab is not None else master
+        self.criar_entrada(**kwargs)
         if self.tamanho_max:
-            vcmd = (master.register(self.on_validate), '%P')
+            vcmd = (self.tab.register(self.on_validate), '%P')
             self.entrada.config(validate="key", validatecommand=vcmd)
             
     def on_validate(self, P):
@@ -86,19 +87,19 @@ class Mascara:
             'Cidade','UF','Nome de Usuário','E-mail','Senha','Repetir Senha',
             'Nome do Documento', 'Data Criação Inicial', 'Data Criação Final',
             'Nome no Documento', 'Numero do Documento', 'Data de Nascimento',
-            'Nome da Mãe', 'Local de Nascimento'
+            'Nome da Mãe', 'Local de Nascimento', 'Nome do Contrato', 'Data Criação Contrato Inicial',
+            'Data Criação Contrato Final', 'Conteúdo do Contrato'
             ]
         text = self.entrada.get()
         if text == texto and text in list_placeholder:
             return ""
         return text.strip()
     
-    def criar_entrada(self, master, x, y, texto, obrigatorio=False, senha=False, width=200, height=25):
-        self.entrada = tk.Entry(master, fg='grey', show='' if senha else None)
+    def criar_entrada(self, x, y, texto, obrigatorio=False, senha=False, width=200, height=25):
+        self.entrada = tk.Entry(self.tab, fg='grey', show='' if senha else None)
         
-        # Adiciona um asterisco se o campo for obrigatório
         if obrigatorio and texto in ['Data de Nascimento', 'CPF', 'CEP', 'Telefone']:
-            texto = texto + "*"
+            texto += "*"
 
         self.entrada.insert(0, texto)
         self.entrada.bind("<KeyRelease>", lambda event: self.evento(event, self.formato, texto))

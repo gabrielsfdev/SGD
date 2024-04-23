@@ -1,0 +1,16 @@
+Título do Documento: Contrato de Prestação de Serviços de Desenvolvimento de Software
+
+Data de Criação: 20 de Abril de 2024
+
+Resumo do Contrato:
+Este documento formaliza o acordo entre a Empresa XYZ, doravante denominada Contratante, e o Desenvolvedor João da Silva, doravante denominado Contratado, para o desenvolvimento de um aplicativo móvel personalizado. O objetivo deste contrato é estabelecer os termos e condições sob os quais o serviço será prestado, incluindo escopo de projeto, prazos, pagamentos e obrigações legais de ambas as partes.
+
+Cláusulas Principais:
+
+Escopo do Projeto: O Contratado desenvolverá um aplicativo móvel conforme as especificações fornecidas pelo Contratante, incluindo funcionalidades como login de usuários, sistema de pedidos online e painel administrativo para gestão de conteúdo.
+Prazos e Entregas: O projeto será entregue em três fases, com a versão final disponível até o dia 30 de novembro de 2024. Cada fase passará por avaliação e aceitação do Contratante antes de prosseguir para a próxima etapa.
+Pagamentos: O pagamento total acordado para o projeto é de R$ 50.000,00, dividido em parcelas correspondentes às etapas de entrega: 30% na assinatura do contrato, 30% após a entrega da primeira fase e 40% na conclusão do projeto.
+Confidencialidade: Ambas as partes concordam em manter em sigilo todas as informações confidenciais compartilhadas durante o projeto, não divulgando detalhes sem o consentimento prévio por escrito da outra parte.
+Rescisão: O contrato pode ser rescindido por qualquer das partes com um aviso prévio de 30 dias, caso haja quebra de qualquer cláusula estabelecida.
+Conclusão:
+Este contrato é vinculativo e foi feito em boa fé com o objetivo de garantir uma colaboração eficaz e produtiva entre as partes. A assinatura deste documento por ambas as partes indica a aceitação de todos os termos e condições descritos acima.
