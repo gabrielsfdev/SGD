@@ -2,24 +2,26 @@ import cv2
 import pytesseract
 import re
 import os
+import convert_format
+import PyPDF2
 
 # Pensar se é necessário transformar a classe em estática em sprint futura
 class OCR_DOCS:
     def __init__(self, img_path) -> None:
-        from .convert_format import format_identificator
         self.path = img_path
-        self.img = format_identificator(img_path)
-        self.extracted = None
+        self.img = convert_format.format_identificator(img_path)
+        self.extracted = ""
         self.name = None
         self.rg_id = None
         self.born_date = None
         self.mother_name = None
         self.place_of_birth = None
         self.attempt = 0
-        self.thresh = 150
+        self.thresh = 100
 
     def new_rg(self):
         file_path = f'app\\data\\masks\\{os.path.basename(self.path)}'
+        # filter = cv2.imread(f"{self.path[:-7]}_gt_segmentation.jpg")
         filter = cv2.imread(f"{file_path[:-7]}_gt_segmentation.jpg")
 
         rgb = cv2.cvtColor(self.img, cv2.COLOR_RGB2BGR)
@@ -74,6 +76,16 @@ class OCR_DOCS:
         retangulo = cv2.minAreaRect(contornos[0])
         angulacao = retangulo[2]
         return angulacao
+    
+    def new_contract(self):
+        pdf_path = self.path
+        with open(pdf_path, 'rb') as file:
+            reader = PyPDF2.PdfReader(file)
+            num_pages = len(reader.pages)  # Usando len() para obter o número de páginas
+            for page_number in range(num_pages):
+                # print("teste")
+                page = reader.pages[page_number]  # Acessando a página diretamente pelo índice
+                self.extracted += page.extract_text()
     
     def find_name(self):
         regex = r"nome\s*([^\n]+)"
@@ -169,6 +181,7 @@ class OCR_DOCS:
 
 
 if __name__ == "__main__":
-    ocr = OCR_DOCS("ambiente_virtual/00025937_in.jpg")
-    ocr.new_rg()
-    print(ocr.extract_info())
+    ocr = OCR_DOCS("ambiente_virtual/contrato.pdf")
+    ocr.new_contract()
+    # print(ocr.extract_info())
+    print(ocr.extracted)
