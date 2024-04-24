@@ -47,7 +47,7 @@ class PagPrincipal(BaseApp):
         )
 
         self.image_photo1 = PhotoImage(
-            file=self.relative_to_assets("photo1.png"))
+            file=self.relative_to_assets("photo2.png"))
         self.photo1 = self.canvas.create_image(
             169.0,
             81.0,
@@ -55,18 +55,8 @@ class PagPrincipal(BaseApp):
         )
 
     def create_button(self):
-        self.adicionar_foto = self.canvas.create_text(
-            130.0,
-            122.5,
-            anchor="nw",
-            text="Adicionar Foto",
-            fill="#FFFFFF",
-            font=("Abel Regular", 14 * -1)
-        )
-        self.bind_text_events_principal(self.adicionar_foto)
-
         self.desconectar = self.canvas.create_text(
-            111.0,
+            100.0,
             150.5,
             anchor="nw",
             text="Desconectar",
