@@ -23,6 +23,7 @@ class OCR_DOCS:
         # Dados do contrato
         self.contratante = None
         self.contratada = None
+        self.num_process = None
 
     def _new_rg(self):
         file_path = f'app\\data\\masks\\{os.path.basename(self.path)}'
@@ -91,6 +92,15 @@ class OCR_DOCS:
 
         regex_contratada = r"contratada :\s*([\w\sÀ-ÿ()-]+)"
         self.contratada = str(re.findall(regex_contratada, self.extracted.lower(), re.DOTALL)[0]).upper()
+
+        regex_num_process = r"processo nº\s*([\d./-]+)"
+        self.num_process = str(re.findall(regex_num_process, self.extracted.lower(), re.DOTALL)[1])
+
+        # regex_cnpj_contratada = r"contratada :(?:.|\n)*?(\b\d{2}\.\d{3}\.\d{3}/\d{4}-\d{2}\b)"
+        # cnpj_contratada = re.findall(regex_cnpj_contratada, self.extracted.lower(), re.DOTALL)
+        # print(cnpj_contratada)
+        
+
 
     def find_name(self):
         regex = r"nome\s*([^\n]+)"
@@ -187,6 +197,10 @@ class OCR_DOCS:
 
 
 if __name__ == "__main__":
+    ocr = OCR_DOCS("ambiente_virtual/contrato.pdf")
+    ocr.extract_contract_info()
+    # print(ocr.num_process)
+    # print(ocr.num_process)
     '''
     Exemplo de uso
     ocr = OCR_DOCS("path")
