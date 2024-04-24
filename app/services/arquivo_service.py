@@ -33,7 +33,7 @@ class Arquivo:
             
             ocr = OCR_DOCS(caminho_arquivo)
             img = ocr.new_rg()
-            dados = ocr.extract_info()
+            dados = ocr.extract_rg_info()
             
             with open(caminho_arquivo, 'rb') as arquivo:
                 dados_arquivo = arquivo.read()

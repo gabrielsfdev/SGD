@@ -18,6 +18,8 @@ class OCR_DOCS:
         self.place_of_birth = None
         self.attempt = 0
         self.thresh = 100
+        self.contratante = None
+        self.contratada = None
 
     def new_rg(self):
         file_path = f'app\\data\\masks\\{os.path.basename(self.path)}'
@@ -31,14 +33,6 @@ class OCR_DOCS:
         img_aux[filtro_cinza < 60] = 255
         thre = cv2.threshold(img_aux, self.thresh, 255, cv2.THRESH_BINARY)[1]
 
-        # cv2.imshow("apos_mudancas", thre)
-        # cv2.imshow("sem rgb", image2)
-        # cv2.waitKey(0)
-
-        # print("shape1", rgb.shape)
-        # cv2.imshow("Imagem Cinza", imagem_cinza)
-        # cv2.waitKey(0)
-
         angulacao = self.identificar_angulacao(self.img)
         # print("angulacao", angulacao)
         osd = pytesseract.image_to_osd(rgb, output_type=pytesseract.Output.DICT)
@@ -47,7 +41,7 @@ class OCR_DOCS:
             angulacao = -osd["rotate"]
         elif angulacao > 45:
             angulacao = angulacao - 90
-            # print('nova', angulacao)
+        # print('nova', angulacao)
 
         altura = largura = max(self.img.shape[:2])
         centro = (largura // 2, altura // 2)
@@ -64,7 +58,6 @@ class OCR_DOCS:
         self.extracted = pytesseract.image_to_string(
             img_aux, lang="por", config="--psm 6"
         )
-        # self.attempt += 1
 
     def identificar_angulacao(self, img):
         imagem_cinza = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -86,7 +79,16 @@ class OCR_DOCS:
                 # print("teste")
                 page = reader.pages[page_number]  # Acessando a página diretamente pelo índice
                 self.extracted += page.extract_text()
-    
+
+    def extract_contract_info(self):
+        self.new_contract()
+
+        regex_contratante = r"contratante :\s*([\w\sÀ-ÿ]+)"
+        self.contratante = str(re.findall(regex_contratante, self.extracted.lower(), re.DOTALL)[0]).upper()
+
+        regex_contratada = r"contratada :\s*([\w\sÀ-ÿ()-]+)"
+        self.contratada = str(re.findall(regex_contratada, self.extracted.lower(), re.DOTALL)[0]).upper()
+
     def find_name(self):
         regex = r"nome\s*([^\n]+)"
         name = re.findall(regex, self.extracted.lower(), re.DOTALL)
@@ -127,9 +129,10 @@ class OCR_DOCS:
         if place_of_birth:
             return place_of_birth[0].upper()
 
-    def extract_info(self):
+    def extract_rg_info(self):
         if self.attempt == 0:
             print("Carregando..")
+            self.new_rg()
         if self.name is None:
             self.name = self.find_name()
         if self.rg_id is None:
@@ -154,7 +157,7 @@ class OCR_DOCS:
             self.attempt += 1
             self.thresh += 5
             self.new_rg()
-            self.extract_info()
+            self.extract_rg_info()
         else:
             print("100%")        
         
@@ -182,6 +185,7 @@ class OCR_DOCS:
 
 if __name__ == "__main__":
     ocr = OCR_DOCS("ambiente_virtual/contrato.pdf")
-    ocr.new_contract()
+    ocr.extract_contract_info()
+    print(ocr.contratante)
     # print(ocr.extract_info())
-    print(ocr.extracted)
+    # print(ocr.extracted)
