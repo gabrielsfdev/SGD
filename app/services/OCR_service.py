@@ -8,9 +8,11 @@ import PyPDF2
 # Pensar se é necessário transformar a classe em estática em sprint futura
 class OCR_DOCS:
     def __init__(self, img_path) -> None:
+        # Geral
         self.path = img_path
-        self.img = convert_format.format_identificator(img_path)
         self.extracted = ""
+        # Dados de RG
+        self.img = convert_format.format_identificator(img_path)
         self.name = None
         self.rg_id = None
         self.born_date = None
@@ -18,10 +20,11 @@ class OCR_DOCS:
         self.place_of_birth = None
         self.attempt = 0
         self.thresh = 100
+        # Dados do contrato
         self.contratante = None
         self.contratada = None
 
-    def new_rg(self):
+    def _new_rg(self):
         file_path = f'app\\data\\masks\\{os.path.basename(self.path)}'
         # filter = cv2.imread(f"{self.path[:-7]}_gt_segmentation.jpg")
         filter = cv2.imread(f"{file_path[:-7]}_gt_segmentation.jpg")
@@ -70,7 +73,7 @@ class OCR_DOCS:
         angulacao = retangulo[2]
         return angulacao
     
-    def new_contract(self):
+    def _new_contract(self):
         pdf_path = self.path
         with open(pdf_path, 'rb') as file:
             reader = PyPDF2.PdfReader(file)
@@ -81,7 +84,7 @@ class OCR_DOCS:
                 self.extracted += page.extract_text()
 
     def extract_contract_info(self):
-        self.new_contract()
+        self._new_contract()
 
         regex_contratante = r"contratante :\s*([\w\sÀ-ÿ]+)"
         self.contratante = str(re.findall(regex_contratante, self.extracted.lower(), re.DOTALL)[0]).upper()
@@ -132,7 +135,7 @@ class OCR_DOCS:
     def extract_rg_info(self):
         if self.attempt == 0:
             print("Carregando..")
-            self.new_rg()
+            self._new_rg()
         if self.name is None:
             self.name = self.find_name()
         if self.rg_id is None:
@@ -156,7 +159,7 @@ class OCR_DOCS:
             print(f"{self.attempt * 5}%")
             self.attempt += 1
             self.thresh += 5
-            self.new_rg()
+            self._new_rg()
             self.extract_rg_info()
         else:
             print("100%")        
@@ -184,8 +187,10 @@ class OCR_DOCS:
 
 
 if __name__ == "__main__":
-    ocr = OCR_DOCS("ambiente_virtual/contrato.pdf")
+    '''
+    Exemplo de uso
+    ocr = OCR_DOCS("path")
     ocr.extract_contract_info()
-    print(ocr.contratante)
-    # print(ocr.extract_info())
-    # print(ocr.extracted)
+    ou
+    ocr.extract_rg_info()
+    '''
