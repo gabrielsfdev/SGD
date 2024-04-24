@@ -14,6 +14,7 @@ Este é um Sistema que gerencia documentos pessoais, coleta os dados a partir da
 - Implementação de autenticação e gestão de usuários, incluindo funcionalidades como registro, login e logout.
 - Desenvolvimento da interface utilizando Tkinter.
 - Utilização do OpenCV para leitura de imagens e do Pytesseract para reconhecimento óptico de caracteres (OCR).
+- Utilização da biblioteca PyPDF2 para processamento de arquivos PDF e extração de texto.
 
 ---
 
@@ -52,6 +53,7 @@ O processo de tratamento de imagens e reconhecimento de texto visa melhorar a qu
 - Carregamento e pré-processamento das imagens.
 - Reconhecimento óptico de caracteres (OCR) utilizando a biblioteca pytesseract.
 - Reconhecimento do tipo de documentação presente na imagem.
+- Utilização da biblioteca PyPDF2 para processamento de arquivos PDF e extração de texto.
 
 ### Utilização
 
