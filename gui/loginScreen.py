@@ -1,5 +1,4 @@
 from tkinter import Button, PhotoImage, Checkbutton, IntVar, messagebox
-import inputField
 from baseApp import BaseApp
 import sys
 from pathlib import Path
@@ -7,6 +6,7 @@ project_dir = Path(__file__).resolve().parent.parent
 sys.path.append(str(project_dir))
 from app.services import Usuario, Sessao
 from app.utils import *
+from app.services import Mascara
 
 
 class Login(BaseApp):
@@ -98,8 +98,8 @@ class Login(BaseApp):
         self.bind_text_events_login(self.esqueci_minha_senha)
 
     def create_entries(self):
-        self.entryUsername = inputField.criar_campo_de_entrada(self, 633.0, 349.0, 'Nome de Usuário')
-        self.entryPassword = inputField.criar_campo_de_entrada(self, 633.0, 429.0, 'Senha', senha=True)
+        self.entryUsername = Mascara(self, formato='nome', x=633.0, y=349.0, texto='Nome de Usuário')
+        self.entryPassword = Mascara(self, formato='nome', x=633.0, y=429.0, texto='Senha', senha=True)
 
     def create_buttons(self):
         self.conectar_image = PhotoImage(
