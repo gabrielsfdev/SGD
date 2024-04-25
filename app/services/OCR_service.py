@@ -2,24 +2,32 @@ import cv2
 import pytesseract
 import re
 import os
+import convert_format
+import PyPDF2
 
 # Pensar se é necessário transformar a classe em estática em sprint futura
 class OCR_DOCS:
     def __init__(self, img_path) -> None:
-        from .convert_format import format_identificator
+        # Geral
         self.path = img_path
-        self.img = format_identificator(img_path)
-        self.extracted = None
+        self.extracted = ""
+        # Dados de RG
+        self.img = convert_format.format_identificator(img_path)
         self.name = None
         self.rg_id = None
         self.born_date = None
         self.mother_name = None
         self.place_of_birth = None
         self.attempt = 0
-        self.thresh = 150
+        self.thresh = 100
+        # Dados do contrato
+        self.contratante = None
+        self.contratada = None
+        self.num_process = None
 
-    def new_rg(self):
+    def _new_rg(self):
         file_path = f'app\\data\\masks\\{os.path.basename(self.path)}'
+        # filter = cv2.imread(f"{self.path[:-7]}_gt_segmentation.jpg")
         filter = cv2.imread(f"{file_path[:-7]}_gt_segmentation.jpg")
 
         rgb = cv2.cvtColor(self.img, cv2.COLOR_RGB2BGR)
@@ -29,14 +37,6 @@ class OCR_DOCS:
         img_aux[filtro_cinza < 60] = 255
         thre = cv2.threshold(img_aux, self.thresh, 255, cv2.THRESH_BINARY)[1]
 
-        # cv2.imshow("apos_mudancas", thre)
-        # cv2.imshow("sem rgb", image2)
-        # cv2.waitKey(0)
-
-        # print("shape1", rgb.shape)
-        # cv2.imshow("Imagem Cinza", imagem_cinza)
-        # cv2.waitKey(0)
-
         angulacao = self.identificar_angulacao(self.img)
         # print("angulacao", angulacao)
         osd = pytesseract.image_to_osd(rgb, output_type=pytesseract.Output.DICT)
@@ -45,7 +45,7 @@ class OCR_DOCS:
             angulacao = -osd["rotate"]
         elif angulacao > 45:
             angulacao = angulacao - 90
-            # print('nova', angulacao)
+        # print('nova', angulacao)
 
         altura = largura = max(self.img.shape[:2])
         centro = (largura // 2, altura // 2)
@@ -62,7 +62,6 @@ class OCR_DOCS:
         self.extracted = pytesseract.image_to_string(
             img_aux, lang="por", config="--psm 6"
         )
-        # self.attempt += 1
 
     def identificar_angulacao(self, img):
         imagem_cinza = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -75,6 +74,34 @@ class OCR_DOCS:
         angulacao = retangulo[2]
         return angulacao
     
+    def _new_contract(self):
+        pdf_path = self.path
+        with open(pdf_path, 'rb') as file:
+            reader = PyPDF2.PdfReader(file)
+            num_pages = len(reader.pages)  # Usando len() para obter o número de páginas
+            for page_number in range(num_pages):
+                # print("teste")
+                page = reader.pages[page_number]  # Acessando a página diretamente pelo índice
+                self.extracted += page.extract_text()
+
+    def extract_contract_info(self):
+        self._new_contract()
+
+        regex_contratante = r"contratante :\s*([\w\sÀ-ÿ]+)"
+        self.contratante = str(re.findall(regex_contratante, self.extracted.lower(), re.DOTALL)[0]).upper()
+
+        regex_contratada = r"contratada :\s*([\w\sÀ-ÿ()-]+)"
+        self.contratada = str(re.findall(regex_contratada, self.extracted.lower(), re.DOTALL)[0]).upper()
+
+        regex_num_process = r"processo nº\s*([\d./-]+)"
+        self.num_process = str(re.findall(regex_num_process, self.extracted.lower(), re.DOTALL)[1])
+
+        # regex_cnpj_contratada = r"contratada :(?:.|\n)*?(\b\d{2}\.\d{3}\.\d{3}/\d{4}-\d{2}\b)"
+        # cnpj_contratada = re.findall(regex_cnpj_contratada, self.extracted.lower(), re.DOTALL)
+        # print(cnpj_contratada)
+        
+
+
     def find_name(self):
         regex = r"nome\s*([^\n]+)"
         name = re.findall(regex, self.extracted.lower(), re.DOTALL)
@@ -115,9 +142,10 @@ class OCR_DOCS:
         if place_of_birth:
             return place_of_birth[0].upper()
 
-    def extract_info(self):
+    def extract_rg_info(self):
         if self.attempt == 0:
             print("Carregando..")
+            self._new_rg()
         if self.name is None:
             self.name = self.find_name()
         if self.rg_id is None:
@@ -141,8 +169,8 @@ class OCR_DOCS:
             print(f"{self.attempt * 5}%")
             self.attempt += 1
             self.thresh += 5
-            self.new_rg()
-            self.extract_info()
+            self._new_rg()
+            self.extract_rg_info()
         else:
             print("100%")        
         
@@ -169,6 +197,14 @@ class OCR_DOCS:
 
 
 if __name__ == "__main__":
-    ocr = OCR_DOCS("ambiente_virtual/00025937_in.jpg")
-    ocr.new_rg()
-    print(ocr.extract_info())
+    ocr = OCR_DOCS("ambiente_virtual/contrato.pdf")
+    ocr.extract_contract_info()
+    # print(ocr.num_process)
+    # print(ocr.num_process)
+    '''
+    Exemplo de uso
+    ocr = OCR_DOCS("path")
+    ocr.extract_contract_info()
+    ou
+    ocr.extract_rg_info()
+    '''
