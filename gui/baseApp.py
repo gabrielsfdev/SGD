@@ -40,6 +40,11 @@ class BaseApp(Tk):
         self.canvas.tag_bind(text_id, "<Enter>", self.on_enter)
         self.canvas.tag_bind(text_id, "<Leave>", self.on_leave)
 
+    def bind_text_events_perfil(self, text_id):
+        self.canvas.tag_bind(text_id, "<Button-1>", self.on_text_click_perfil)
+        self.canvas.tag_bind(text_id, "<Enter>", self.on_enter)
+        self.canvas.tag_bind(text_id, "<Leave>", self.on_leave)
+
     def on_text_click_login(self, event):
         text_id = self.canvas.find_closest(event.x, event.y)[0]
         if text_id == self.cadastre:
@@ -49,9 +54,7 @@ class BaseApp(Tk):
 
     def on_text_click_principal(self, event):
         text_id = self.canvas.find_closest(event.x, event.y)[0]
-        if text_id == self.adicionar_foto:
-            self.open_adicionar_foto()
-        elif text_id == self.desconectar:
+        if text_id == self.desconectar:
             sessao = Sessao()
             if sessao.usuario_logado():
                 if sessao.limpa_sessao():
@@ -65,7 +68,12 @@ class BaseApp(Tk):
         elif text_id == self.editar_perfil:
             self.open_perfil()
         elif text_id == self.consultar_documentos:
-            self.open_consultar_documentos()        
+            self.open_consultar_documentos()
+
+    def on_text_click_perfil(self, event):
+        text_id = self.canvas.find_closest(event.x, event.y)[0]
+        if text_id == self.adicionar_foto:
+            self.open_adicionar_foto()       
 
     def on_enter(self, event):
         self.canvas.config(cursor="hand2")

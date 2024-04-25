@@ -1,5 +1,4 @@
 from tkinter import Canvas, PhotoImage, Button
-import inputField
 from baseApp import BaseApp
 import sys
 from pathlib import Path

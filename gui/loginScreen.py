@@ -141,7 +141,7 @@ class Login(BaseApp):
         realizar_login = usuario.login_usuario()
         
         if realizar_login['success']:
-            messagebox.showinfo('Sucesso', f'{realizar_login['message']}\nBem vindo {realizar_login['usuario'].nome_usuario}')
+            messagebox.showinfo('Sucesso', f"{realizar_login['message']}\nBem vindo {realizar_login['usuario'].nome_usuario}")
             self.destroy()
             from principalScreen import PagPrincipal
             PagPrincipal(self).run()
