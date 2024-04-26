@@ -1,5 +1,9 @@
 from tkinter import Button, PhotoImage
-import inputField
+import sys
+from pathlib import Path
+project_dir = Path(__file__).resolve().parent.parent
+sys.path.append(str(project_dir))
+from app.services import Mascara
 from baseApp import BaseApp
 
 class RecuperarSenha(BaseApp):
@@ -61,7 +65,7 @@ class RecuperarSenha(BaseApp):
         )
 
     def create_entries(self):
-        self.entryEmail = inputField.criar_campo_de_entrada(self, 267.0, 259.0, 'Digite seu E-mail')
+        self.entryEmail = Mascara(self, formato='nome', x=267.0, y=259.0, texto='Digite seu E-mail')
     
     def create_buttons(self):
         self.image_voltar = PhotoImage(
