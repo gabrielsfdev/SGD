@@ -133,7 +133,7 @@ class Perfil(Photo):
             fill="#FFFFFF",
             font=("Abel Regular", 14 * -1)
         )
-        self.bind_text_events_principal(self.adicionar_foto)
+        self.bind_text_events_perfil(self.adicionar_foto)
 
 
         self.image_voltar = PhotoImage(
@@ -190,7 +190,7 @@ class Perfil(Photo):
 
     def open_adicionar_foto(self):
         self.upload_image()
-        
+
     def recupera_usuario(self):
         usuario = Sessao()
         try:
