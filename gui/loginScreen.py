@@ -135,8 +135,8 @@ class Login(BaseApp):
         )
     
     def login(self):
-        username = self.entryUsername.get()
-        password = self.entryPassword.get()
+        username = self.entryUsername.get('Nome de Usuário ou E-mail')
+        password = self.entryPassword.get('Senha')
         usuario = Usuario(username, password)
         realizar_login = usuario.login_usuario()
         

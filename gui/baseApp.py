@@ -49,9 +49,9 @@ class BaseApp(Tk):
 
     def on_text_click_principal(self, event):
         text_id = self.canvas.find_closest(event.x, event.y)[0]
-        if text_id == self.adicionar_foto:
-            self.open_adicionar_foto()
-        elif text_id == self.desconectar:
+        #if text_id == self.adicionar_foto:
+            #self.open_adicionar_foto()
+        if text_id == self.desconectar:
             sessao = Sessao()
             if sessao.usuario_logado():
                 if sessao.limpa_sessao():

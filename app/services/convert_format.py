@@ -7,7 +7,8 @@ from pillow_heif import register_heif_opener
 register_heif_opener()
 
 def format_identificator(img_path):
-    if img_path[:-3] == "jpg" or img_path[:-3] == "jpeg" or img_path[:-3] == "png" or img_path[:-3] == "HEIC":
+    format = img_path[-3:]
+    if img_path[-3:] == "jpg" or img_path[-3:] == "peg" or img_path[-3:] == "png" or img_path[-3:] == "EIC":
         # img = Image.fromarray(img)
         img = Image.open(img_path)
         # print("O formato é: ", img.format) # Apenas para debug

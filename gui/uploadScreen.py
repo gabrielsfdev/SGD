@@ -2,7 +2,7 @@ import sys
 from pathlib import Path
 project_dir = Path(__file__).resolve().parent.parent
 sys.path.append(str(project_dir))
-from tkinter import Button, PhotoImage, filedialog, messagebox
+from tkinter import Button, PhotoImage, filedialog, messagebox, ttk
 from baseApp import BaseApp
 from app.services import Arquivo
 
@@ -85,7 +85,7 @@ class Upload(BaseApp):
             text="SGD",
             fill="#FFFFFF",
             font=("AbhayaLibre Regular", 40 * -1)
-        )
+        )            
 
     def janela_selecao(self):
         caminho_arquivo = filedialog.askopenfilename(
@@ -112,10 +112,14 @@ class Upload(BaseApp):
             open.run()
         except:
             messagebox.showerror("Falha no Upload", result)
-            self.destroy()
-            from loginScreen import Login
-            open = Login(self)
-            open.run()
+            if 'logado' in result:
+                self.destroy()
+                from loginScreen import Login
+                open = Login(self)
+            else:
+                self.destroy()
+                open = Upload(self)
+                open.run()
 
     def open_principal(self):
         self.destroy()
@@ -125,3 +129,7 @@ class Upload(BaseApp):
 
     def run(self):
         self.mainloop()
+        
+controller = True
+app = Upload(controller)
+app.mainloop()

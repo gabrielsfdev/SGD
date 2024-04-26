@@ -40,7 +40,6 @@ class Arquivo:
             from app.services import OCR_DOCS
             
             ocr = OCR_DOCS(caminho_arquivo)
-            # img = ocr._new_rg()
             dados = ocr.extract_rg_info()
             
             with open(caminho_arquivo, 'rb') as arquivo:
@@ -84,6 +83,11 @@ class Arquivo:
             if not id_usuario:
                 raise Exception("Usuário não está logado.")
             
+            from app.services import OCR_DOCS
+            
+            ocr = OCR_DOCS(caminho_arquivo)
+            dados = ocr.extract_contract_info()
+            
             with open(caminho_arquivo, 'rb') as arquivo:
                 dados_arquivo = arquivo.read()
                 tamanho = os.path.getsize(caminho_arquivo)
@@ -97,16 +101,17 @@ class Arquivo:
                 blob_arquivo = ArquivoBlobBD(idarquivo=novo_arquivo.id, blob_dados=dados_arquivo)
                 self.db_session.add(blob_arquivo)
                 
-                with open('app\\data\\conteudo_exemplo.txt', 'r', encoding='utf-8') as arquivo:
-                    conteudo = arquivo.read()
+                if dados['success']:
                 
-                dados_contrato = DadosArquivoBD(
-                    idarquivo=novo_arquivo.id,
-                    resumo_arquivo='Esse é um resumo de teste para inserir no arquivo.',
-                    conteudo_arquivo=conteudo
-                )
+                    dados_contrato = DadosArquivoBD(
+                        idarquivo=novo_arquivo.id,
+                        conteudo_arquivo=dados['dados']['conteudo'],
+                        contratante=dados['dados']['contratante'],
+                        contratada=dados['dados']['contratada'],
+                        num_processo=dados['dados']['num_processo'],
+                    )
 
-                self.db_session.add(dados_contrato)
+                    self.db_session.add(dados_contrato)
 
                 self.db_session.commit()
                 
@@ -199,6 +204,15 @@ class Arquivo:
                                 filtro_arquivo.append(ArquivoBD.datacriacao <= data_formatada)
                         except ValueError:
                             return {'success': False, 'message': f'Formato de data inválido para {chave}.'}
+                    elif chave == 'partes_contrato':
+                        filtro_arquivo.append(
+                            or_(
+                                func.lower(DadosArquivoBD.contratada).contains(valor.lower()),
+                                func.lower(DadosArquivoBD.contratante).contains(valor.lower())
+                            )
+                        )
+                    elif chave == 'num_processo':
+                        filtro_arquivo.append(DadosArquivoBD.num_processo.contains(valor))
                     elif chave == 'conteudo_arquivo':
                         filtro_contrato.append(func.lower(DadosArquivoBD.conteudo_arquivo).contains(valor.lower()))
                         palavras = valor.split()
@@ -223,7 +237,7 @@ class Arquivo:
             busca = (session.query(
                     ArquivoBD.id,
                     ArquivoBD.nome_arquivo,
-                    DadosArquivoBD.resumo_arquivo.label('resumo_contrato'),
+                    DadosArquivoBD.num_processo,
                     ArquivoBD.datacriacao)
                     .join(DadosArquivoBD, ArquivoBD.id == DadosArquivoBD.idarquivo)
                     .filter(condicao_final)
