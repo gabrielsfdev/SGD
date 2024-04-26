@@ -2,17 +2,17 @@ import cv2
 import pytesseract
 import re
 import os
-import convert_format
 import PyPDF2
 
 # Pensar se é necessário transformar a classe em estática em sprint futura
 class OCR_DOCS:
     def __init__(self, img_path) -> None:
+        from .convert_format import format_identificator
         # Geral
         self.path = img_path
         self.extracted = ""
         # Dados de RG
-        self.img = convert_format.format_identificator(img_path)
+        self.img = format_identificator(img_path)
         self.name = None
         self.rg_id = None
         self.born_date = None
@@ -27,8 +27,8 @@ class OCR_DOCS:
 
     def _new_rg(self):
         file_path = f'app\\data\\masks\\{os.path.basename(self.path)}'
-        # filter = cv2.imread(f"{self.path[:-7]}_gt_segmentation.jpg")
         filter = cv2.imread(f"{file_path[:-7]}_gt_segmentation.jpg")
+        #filter = cv2.imread(f"{file_path[:-7]}_gt_segmentation.jpg")
 
         rgb = cv2.cvtColor(self.img, cv2.COLOR_RGB2BGR)
         imagem_cinza = cv2.cvtColor(rgb, cv2.COLOR_BGR2GRAY)
@@ -100,6 +100,25 @@ class OCR_DOCS:
         # cnpj_contratada = re.findall(regex_cnpj_contratada, self.extracted.lower(), re.DOTALL)
         # print(cnpj_contratada)
         
+        if any(
+            [
+                self.extracted,
+                self.contratante,
+                self.contratada,
+                self.num_process,
+            ]
+        ):
+        
+            dados_contrato = {
+                'conteudo': self.extracted if self.extracted else '',
+                'contratante': self.contratante if self.contratante else '',
+                'contratada': self.contratada if self.contratada else '',
+                'num_processo': self.num_process if self.num_process else ''
+            }
+        
+            return {'success': True, 'message': 'Dados extraídos com sucesso', 'dados': dados_contrato}
+        
+        return {'success': False, 'message': 'Fazer modificações na imagem e tentar novamente'}
 
 
     def find_name(self):

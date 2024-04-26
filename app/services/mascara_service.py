@@ -88,7 +88,8 @@ class Mascara:
             'Nome do Documento', 'Data Criação Inicial', 'Data Criação Final',
             'Nome no Documento', 'Numero do Documento', 'Data de Nascimento',
             'Nome da Mãe', 'Local de Nascimento', 'Nome do Contrato', 'Data Criação Contrato Inicial',
-            'Data Criação Contrato Final', 'Conteúdo do Contrato'
+            'Data Criação Contrato Final', 'Conteúdo do Contrato', 'Partes do Contrato', 'Número do Contrato',
+            'Nome de Usuário ou E-mail', 'Senha'
             ]
         text = self.entrada.get()
         if text == texto and text in list_placeholder:

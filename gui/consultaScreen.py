@@ -48,20 +48,6 @@ class Consulta(BaseTab):
                 self.create_search_and_treeview_contrato(tab)
 
 
-    '''
-    def create_tabs(self):
-        self.tab_documento = ttk.Frame(self.notebook)
-        self.notebook.add(self.tab_documento, text='Documentos')
-        self.create_canvas_in_tab(self.tab_documento, 'Documentos')
-        self.create_search_and_treeview_documento(self.tab_documento)
-        
-        self.tab_contrato = ttk.Frame(self.notebook)
-        self.notebook.add(self.tab_contrato, text='Contratos')
-        self.create_canvas_in_tab(self.tab_contrato, 'Contratos')
-        self.create_search_and_treeview_contrato(self.tab_contrato)
-    '''
-
-
     def create_search_and_treeview_documento(self, tab):        
         self.nome_arquivo = Mascara(self, formato='nome', x=100, y=10.0, texto='Nome do Documento', tab=tab)
         self.data_inicial = Mascara(self, formato="date", tamanho_max=8, x=400, y=10.0, texto='Data Criação Inicial', tab=tab)
@@ -72,12 +58,12 @@ class Consulta(BaseTab):
         self.nome_mae = Mascara(self, formato="nome", x=100, y=110.0, texto='Nome da Mãe', tab=tab)
         self.local_nascimento = Mascara(self, formato="nome", x=400, y=110.0, texto='Local de Nascimento', tab=tab)
 
-        y_offset = 105
+        y_offset = 55
 
         image_lupa = PhotoImage(file=self.relative_to_assets("lupa.png"))
         lupa_button = Button(tab, image=image_lupa, borderwidth=0, highlightthickness=0, command=lambda: self.populate_treeview_documento(tab), relief="flat")
         lupa_button.image = image_lupa
-        lupa_button.place(x=770, y=y_offset, width=46, height=40)
+        lupa_button.place(x=950, y=y_offset, width=46, height=40)
 
         y_offset = 0
 
@@ -132,13 +118,15 @@ class Consulta(BaseTab):
         self.nome_contrato = Mascara(self, formato='nome', x=100, y=30.0, texto='Nome do Contrato', tab=tab)
         self.data_inicial_contrato = Mascara(self, formato="date", tamanho_max=8, x=400, y=30.0, texto='Data Criação Contrato Inicial', tab=tab)
         self.data_final_contrato = Mascara(self, formato="date", tamanho_max=8, x=700, y=30.0, texto='Data Criação Contrato Final', tab=tab)
-        self.conteudo_contrato = Mascara(self, formato="nome", x=100, y=80.0, texto='Conteúdo do Contrato', tab=tab)
-        y_offset = 85
+        self.partes_contrato = Mascara(self, formato="nome", x=100, y=80.0, texto='Partes do Contrato', tab=tab)
+        self.numero_contrato = Mascara(self, formato="nome", x=400, y=80.0, texto='Número do Contrato', tab=tab)
+        self.conteudo_contrato = Mascara(self, formato="nome", x=700, y=80.0, texto='Conteúdo do Contrato', tab=tab)
+        y_offset = 55
 
         image_lupa = PhotoImage(file=self.relative_to_assets("lupa.png"))
         lupa_button = Button(tab, image=image_lupa, borderwidth=0, highlightthickness=0, command=lambda: self.populate_treeview_contrato(tab), relief="flat")
         lupa_button.image = image_lupa
-        lupa_button.place(x=770, y=y_offset, width=46, height=40)
+        lupa_button.place(x=950, y=y_offset, width=46, height=40)
 
         y_offset = 0
 
@@ -152,8 +140,8 @@ class Consulta(BaseTab):
         tree_style.configure("Treeview", background="white", foreground="black", rowheight=25, fieldbackground="white")
         tree_style.map("Treeview", background=[('selected', '#0078D7')])
 
-        tree = ttk.Treeview(tab, columns=('ID', 'Nome Arquivo', 'Resumo', 'Data Criação', 'Download'), show='headings')
-        for col in ('ID', 'Nome Arquivo', 'Resumo', 'Data Criação'):
+        tree = ttk.Treeview(tab, columns=('ID', 'Nome Arquivo', 'Nº do Contrato', 'Data Criação', 'Download'), show='headings')
+        for col in ('ID', 'Nome Arquivo', 'Nº do Contrato', 'Data Criação'):
             tree.heading(col, text=col)
             tree.column(col, width=100, anchor=tk.CENTER)
 
@@ -162,7 +150,7 @@ class Consulta(BaseTab):
 
         data = self.campos_preenchidos('contrato')
         for item in data:
-            iid = tree.insert('', 'end', values=(item.id, item.nome_arquivo, item.resumo_contrato, item.datacriacao.strftime('%d/%m/%Y'), 'Baixar Arquivo ▼'))
+            iid = tree.insert('', 'end', values=(item.id, item.nome_arquivo, item.num_processo, item.datacriacao.strftime('%d/%m/%Y'), 'Baixar Arquivo ▼'))
 
         tree.pack(expand=True, fill='both', pady=(y_offset, 0))
 
@@ -209,6 +197,8 @@ class Consulta(BaseTab):
                 'nome_arquivo': self.nome_contrato.get('Nome do Contrato'),
                 'data_inicial': self.data_inicial_contrato.get('Data Criação Contrato Inicial'),
                 'data_final': self.data_final_contrato.get('Data Criação Contrato Final'),
+                'partes_contrato': self.partes_contrato.get('Partes do Contrato'),
+                'num_processo': self.numero_contrato.get('Número do Contrato'),
                 'conteudo_arquivo': self.conteudo_contrato.get('Conteúdo do Contrato')
             }
     
@@ -239,7 +229,3 @@ class Consulta(BaseTab):
 
     def run(self):
         self.mainloop()
-
-controller = True
-app = Consulta(controller)
-app.mainloop()
